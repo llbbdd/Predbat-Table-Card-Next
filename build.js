@@ -13,7 +13,7 @@ const isDev = process.env.NODE_ENV === 'development';
 const buildOptions = {
     entryPoints: ['src/predbat-card.ts'],
     bundle: true,
-    outfile: 'dist/predbat-card.js',
+    outfile: 'dist/Predbat-Table-Card-Next.js',
     format: 'esm',
     target: ['es2020'],
     define: {

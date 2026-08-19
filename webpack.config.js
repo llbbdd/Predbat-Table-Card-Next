@@ -35,7 +35,7 @@ const config = {
     })
   ],
   output: {
-    filename: "predbat-card.js",
+    filename: "Predbat-Table-Card-Next.js",
     path: path.resolve(__dirname, "dist"),
   },
 };

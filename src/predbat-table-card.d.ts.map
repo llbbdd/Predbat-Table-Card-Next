@@ -1,1 +1,0 @@
-{"version":3,"file":"predbat-table-card.d.ts","sourceRoot":"","sources":["predbat-table-card.ts"],"names":[],"mappings":"AAAA,UAAU,UAAU;IAClB,IAAI,EAAE,MAAM,CAAC;IACb,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,EAAE,OAAO,CAAC;IACjB,WAAW,EAAE,MAAM,CAAC;IACpB,gBAAgB,EAAE,MAAM,CAAC;CAC1B;AAED,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,MAAM;QACd,WAAW,EAAE,UAAU,EAAE,CAAC;KAC3B;CACF"}

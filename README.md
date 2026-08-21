@@ -2,7 +2,7 @@
 
 Predbat Table Card is a custom Home Assistant card that displays your [Predbat](https://github.com/springfall2008/batpred) energy management plan in a clean, compact table format. It provides an overview of your solar, battery, and grid interactions across 30-minute intervals, including import/export rates, PV forecasts, load consumption, battery state of charge, and cost tracking. The card supports dynamic column visibility, responsive layouts for mobile, tablets and desktop, and override controls for manual demand/charge/export management. It provides an intuitive way to monitor and control your Predbat energy system directly from your dashboard.
 
-<img src="images/table.png" width="300">
+![Table Image](images/table.png)
 
 My system doesn't have all the features Predbat supports, which means I can't test it 100%, so feel free to feed back any problems you find. Thanks.
 

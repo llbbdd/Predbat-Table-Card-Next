@@ -1,3 +1,5 @@
 {
-  "name": "Predbat Card Next"
+  "name": "Predbat Card Next",
+  "render_readme": true,
+  "filename": "Predbat-Table-Card-Next.js"
 }

@@ -1,19 +1,51 @@
 {
-  "name": "predbat-table-card-main",
+  "name": "predbat-card-main",
   "version": "1.0.0",
   "type": "module",
   "description": "The Predbat Table Card is **no longer maintained**. It's been a pleasure to serve you, and I hope that folks enjoyed the card while it lasted.",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "watch": "tsc --watch",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build:dev": "NODE_ENV=development webpack --config webpack.config.js",
+    "build:prod": "NODE_ENV=production webpack --config webpack.config.js",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@eslint/js": "^10.0.1",
+    "@jest/globals": "^30.4.1",
+    "@js-temporal/polyfill": "^0.5.1",
     "@mdi/js": "^7.4.47",
+    "@stylistic/eslint-plugin": "^5.10.0",
+    "@types/is-semver": "^1.0.2",
+    "@types/jest": "^30.0.0",
     "@types/node": "^26.1.1",
-    "typescript": "^6.0.3"
+    "babel-jest": "^30.4.1",
+    "esbuild": "^0.28.1",
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "jiti": "^2.7.0",
+    "ts-jest": "^29.4.11",
+    "ts-loader": "^9.6.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.63.0",
+    "webpack": "^5.108.4",
+    "webpack-cli": "^7.2.1"
+  },
+  "dependencies": {
+    "custom-card-helpers": "^1.9.0",
+    "home-assistant-js-websocket": "^9.6.0",
+    "is-semver": "^1.0.12",
+    "lit": "^3.3.3",
+    "zod": "^4.4.3"
   }
 }

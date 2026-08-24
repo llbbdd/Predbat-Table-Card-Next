@@ -8,7 +8,7 @@ My system doesn't have all the features Predbat supports, which means I can't te
 
 Inpired by the original, but now abandoned, predbat-table-card.
 
-## Installation
+## HACS Installation (addition to HACS is currently under review - use manual install process for now)
 
 1. Open HACS
 2. Add `https://https://github.com/llbbdd/Predbat-Table-Card-Next` as a custom repository, using the `Dashboard` category
@@ -17,6 +17,52 @@ Inpired by the original, but now abandoned, predbat-table-card.
 5. Go to your chosen dashboard and select `edit`
 6. Select `add card` button
 7. Add the `Predbat Table Card Next` card
+
+## Manual Installation
+
+If you prefer to install the card manually or are not using HACS, you can follow these steps:
+
+1.  **Download the latest release**:
+    - Go to the [Releases](https://github.com/llbbdd/Predbat-Table-Card-Next/releases) page of this repository.
+    - Download the `Predbat-Table-Card-Next.js` file from the latest release's assets (or download the source code zip and extract it).
+
+2.  **Place the file in your Home Assistant configuration directory**:
+    - Copy the `Predbat-Table-Card-Next.js` file into your Home Assistant `config/www/` directory. If the `www` folder doesn't exist, create it.
+    - For example, the file path might be: `/config/www/Predbat-Table-Card-Next.js`.
+
+3.  **Add the resource to your Lovelace configuration**:
+    - In your Home Assistant dashboard, go to **Settings** → **Dashboards**.
+    - Click the three-dot menu (⋮) and select **Resources**.
+    - Click **Add Resource**.
+    - Enter the URL: `/local/Predbat-Table-Card-Next.js?v=1.0.0` (replace `1.0.0` with the version you downloaded).
+    - Select **JavaScript Module** as the resource type and click **Create**.
+
+4.  **Add the card to your dashboard**:
+    - Go to your dashboard and enter edit mode.
+    - Click the **"Add Card"** button and choose **"Manual Card"**.
+    - Paste the following configuration, adjusting the options as needed:
+
+```yaml
+type: custom:predbat-card-next
+entity: predbat.plan_html
+columns:
+  - state-column
+  - soc-column
+  - limit-column
+  - import-column
+  - export-column
+  - pv-column
+  - clip-column
+  - load-column
+  - xload-column
+  - car-column
+  - net-energy-column
+  - cost-column
+  - overrides-column
+weather_entity: weather.forecast_home
+day_limit: 2
+battery_lower_limit: 20
+```
 
 ## Card Configuration
 

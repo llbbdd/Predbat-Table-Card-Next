@@ -148,7 +148,14 @@ const RawRowSchema = z.object({
   import_rate_adjusted: z.number(),
   export_rate_adjusted: z.number(),
   state: z.string(),
-  state_target: z.string().nullable(),
+  state_target: z.preprocess(
+    (val) => {
+      if (val === '' || val === null || val === undefined) return null;
+      const num = Number(val);
+      return isNaN(num) ? null : num;
+    },
+    z.number().nullable()
+  ),
   state_override: z.string(),
   state_html: z.string(),
   state_text: z.string(),
@@ -228,7 +235,7 @@ export type PredbatRowData = {
   'export-column': { value: RawRow['export_rate']; colour: string } | null;
   'pv-column': { value: RawRow['pv_forecast']; colour: string } | null;
   'state-column': { value: RawRow['state']; colour: string } | null;
-  'limit-column': { value: string; colour: string } | null;
+  'limit-column': { value: number | null; colour: string } | null;
   'soc-column': { value: RawRow['soc_percent']; change: 'rising' | 'same' | 'falling'; colour: string } | null;
   'cost-column': { value: RawRow['cost_change']; change: 'rising' | 'same' | 'falling'; colour: string } | null;
   'car-column': { value: RawRow['car_charging']; colour: string } | null;

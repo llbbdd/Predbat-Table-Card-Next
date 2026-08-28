@@ -201,6 +201,13 @@ export class TableRenderer {
               break;
             }
             ////
+            case 'limit-column': {
+              cellInner.style.color = columnData.colour;
+              cellInner.textContent = `${columnData.value}%`;
+
+              break;
+            }
+            ////
             case 'weather-column': {
               if (typeof columnData.value !== 'string') throw new Error('Invalid weather-column data');
 

@@ -121,7 +121,7 @@ export class PredbatData {
       if (row.export_rate !== 0) this._hasData['export-column'] = true;
       if (row.pv_forecast !== null) this._hasData['pv-column'] = true;
       this._hasData['state-column'] = true;
-      if (row.state_target !== '') this._hasData['limit-column'] = true;
+      if (row.state_target !== null) this._hasData['limit-column'] = true;
       if (row.soc_percent > 0) this._hasData['soc-column'] = true;
       if (row.cost_change > 0) this._hasData['cost-column'] = true;
       if (row.car_charging !== undefined) this._hasData['car-column'] = true;

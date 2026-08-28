@@ -558,7 +558,7 @@ describe('general-utils', () => {
             soc_change: 2,
             import_rate: 0.15,
             export_rate: 0.10,
-            state_target: '85',
+            state_target: 85,
             pv_color: '#ffffff',
             soc_color: '#ffffff',
             load_color: '#ffffff',
@@ -629,7 +629,7 @@ describe('general-utils', () => {
       const rawData: RawData = {
         rows: [
           {
-            time: '2024-01-15T09:00:00+00:00', pv_forecast: 0.5, soc_percent: 80, load_forecast: 0.3, state: 'Chrg', cost_change: 0.05, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: '85',
+            time: '2024-01-15T09:00:00+00:00', pv_forecast: 0.5, soc_percent: 80, load_forecast: 0.3, state: 'Chrg', cost_change: 0.05, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: 85,
             pv_color: '#ffffff',
             soc_color: '#ffffff',
             load_color: '#ffffff',
@@ -663,7 +663,7 @@ describe('general-utils', () => {
             split: false
           },
           {
-            time: '2024-01-15T10:00:00+00:00', pv_forecast: 0.6, soc_percent: 82, load_forecast: 0.4, state: 'Chrg', cost_change: 0.06, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: '85',
+            time: '2024-01-15T10:00:00+00:00', pv_forecast: 0.6, soc_percent: 82, load_forecast: 0.4, state: 'Chrg', cost_change: 0.06, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: 85,
             pv_color: '#ffffff',
             soc_color: '#ffffff',
             load_color: '#ffffff',
@@ -697,7 +697,7 @@ describe('general-utils', () => {
             split: false
           },
           {
-            time: '2024-01-15T11:00:00+00:00', pv_forecast: 0.7, soc_percent: 84, load_forecast: 0.5, state: 'Chrg', cost_change: 0.07, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: '85',
+            time: '2024-01-15T11:00:00+00:00', pv_forecast: 0.7, soc_percent: 84, load_forecast: 0.5, state: 'Chrg', cost_change: 0.07, soc_change: 2, import_rate: 0.15, export_rate: 0.10, state_target: 85,
             pv_color: '#ffffff',
             soc_color: '#ffffff',
             load_color: '#ffffff',

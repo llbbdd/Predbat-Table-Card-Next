@@ -48,7 +48,7 @@ export const columnHeaderText: { [K in ColumnType]: string } = {
   'time-column': 'Time',
   'import-column': 'Import',
   'export-column': 'Export',
-  'limit-column': 'Target SoC',
+  'limit-column': 'Target',
   'pv-column': 'PV',
   'load-column': 'Load',
   'soc-column': 'SoC',

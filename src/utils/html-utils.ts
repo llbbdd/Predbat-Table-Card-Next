@@ -383,7 +383,7 @@ export function socBarElement(value: number, colour: string, change: 'rising' | 
 
   const contentWrapper = divElement('bar-element-content-wrapper');
 
-  const valueSpan = spanElement('batterySoC', undefined, value);
+  const valueSpan = spanElement('batterySoC', undefined, `${value}%`);
 
   const arrowContainer = spanElement('iconContainerSOC');
   arrowContainer.appendChild(arrowIconElement(change));

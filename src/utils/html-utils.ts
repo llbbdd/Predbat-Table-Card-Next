@@ -146,10 +146,13 @@ export function styleElement(id: string, styleString: string): HTMLStyleElement 
 }
 
 // Helper to create override buttons container with proper event handling
-export function overrideButtonsDivElement(timeForSelectOverride: string, forceEntityObjects: EntityObject[], size: number, isClickable: boolean, createButtonForOverrides: (entityObject: EntityObject, timeForSelectOverride: string, size: number, fromPopup: boolean, isClickable: boolean) => HTMLDivElement): HTMLElement {
+export function overrideButtonsDivElement(timeForSelectOverride: string, forceEntityObjects: EntityObject[], size: number, isClickable: boolean, includeExport: boolean, createButtonForOverrides: (entityObject: EntityObject, timeForSelectOverride: string, size: number, fromPopup: boolean, isClickable: boolean) => HTMLDivElement): HTMLElement {
   const container = divElement('overrideButtons');
 
   for (const forceEntity of forceEntityObjects) {
+    // Don't show export icons if there is no export column (export is disabled in predbat)
+    if (!includeExport && (forceEntity.entityName === 'select.predbat_manual_export' || forceEntity.entityName === 'select.predbat_manual_freeze_export')) continue;
+
     const icon = createButtonForOverrides(forceEntity, timeForSelectOverride, size, true, isClickable);
 
     container.appendChild(icon);

@@ -294,7 +294,7 @@ export class TableRenderer {
 
               const editOveridesIcon = activeEntity ? this._createButtonForOverrides(activeEntity, friendlyTimeValue, 18, false, isClickable) : editOveridesIconElement(isHighlighted, isClickable);
 
-              if (isClickable) editOveridesIcon.addEventListener('click', () => this._createPopUpForOverrides(friendlyTimeValue, forceEntityObjects));
+              if (isClickable) editOveridesIcon.addEventListener('click', () => this._createPopUpForOverrides(friendlyTimeValue, rightColumns.includes('export-column') , forceEntityObjects));
 
               cellInner.appendChild(editOveridesIcon);
 
@@ -306,6 +306,9 @@ export class TableRenderer {
               const overrideButtonsGroup = spanElement('overrideButtons');
 
               for (const forceEntity of forceEntityObjects) {
+                // Don't show export icons if there is no export column (export is disabled in predbat)
+                if (!rightColumns.includes('export-column') && (forceEntity.entityName === 'select.predbat_manual_export' || forceEntity.entityName === 'select.predbat_manual_freeze_export')) continue;
+
                 const icon = this._createButtonForOverrides(forceEntity, friendlyTimeValue, 18, false, isClickable);
 
                 overrideButtonsGroup.appendChild(icon);
@@ -636,10 +639,10 @@ export class TableRenderer {
     });
   }
 
-  private _createPopUpForOverrides(timeForSelectOverride: string, forceEntityObjects: EntityObject[]): void {
+  private _createPopUpForOverrides(timeForSelectOverride: string, includeExport: boolean, forceEntityObjects: EntityObject[]): void {
     this._openModal('override-modal-overlay', (closeModalCallback) => {
       const modalBox = divElement('modal');
-      const bodyContainer = overrideButtonsDivElement(timeForSelectOverride, forceEntityObjects, 40, true, this._createButtonForOverrides);
+      const bodyContainer = overrideButtonsDivElement(timeForSelectOverride, forceEntityObjects, 40, true, includeExport, this._createButtonForOverrides);
       const modalTitle = divElement('modalTitle');
       const timestampElement = spanElement('modalTitleText', undefined, timeForSelectOverride);
       const closeIcon = modalCloseIcon(closeModalCallback);

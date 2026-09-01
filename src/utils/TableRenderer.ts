@@ -639,7 +639,7 @@ export class TableRenderer {
   private _createPopUpForOverrides(timeForSelectOverride: string, forceEntityObjects: EntityObject[]): void {
     this._openModal('override-modal-overlay', (closeModalCallback) => {
       const modalBox = divElement('modal');
-      const bodyContainer = overrideButtonsDivElement(timeForSelectOverride, forceEntityObjects, 44, true, this._createButtonForOverrides);
+      const bodyContainer = overrideButtonsDivElement(timeForSelectOverride, forceEntityObjects, 40, true, this._createButtonForOverrides);
       const modalTitle = divElement('modalTitle');
       const timestampElement = spanElement('modalTitleText', undefined, timeForSelectOverride);
       const closeIcon = modalCloseIcon(closeModalCallback);

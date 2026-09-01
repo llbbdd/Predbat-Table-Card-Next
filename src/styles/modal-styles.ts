@@ -22,7 +22,7 @@ export const modalStyles = `
     display: flex;
     flex-direction: column;
     position: relative;
-    min-width: 400px;
+    max-width: 300px;
     padding: 20px;
   }
 

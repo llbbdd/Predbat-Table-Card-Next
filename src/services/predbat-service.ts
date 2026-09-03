@@ -69,7 +69,7 @@ export class PredbatService {
           this._startPolling();
         }
         else {
-          console.error(error);
+          console.error('Predbat is unreachable');
         }
       })
       .finally(() => {

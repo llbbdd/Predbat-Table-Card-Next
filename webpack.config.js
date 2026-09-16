@@ -7,7 +7,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-const version = packageJson.version || '1.0.0';
+const version = packageJson.version || '1.1.0';
 const isDev = process.env.NODE_ENV === 'development';
 const versionString = `${version}`;
 

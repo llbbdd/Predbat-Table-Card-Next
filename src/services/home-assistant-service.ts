@@ -102,15 +102,16 @@ export class HomeAssistantService {
   };
 
   private _getVersions(entityId: 'update.predbat_version' | 'update.predbat_table_card_update'): SoftwareVersion {
-    if (process.env.NODE_ENV === 'development') {
+    try {
+      const versionEntityAttributes = this.getState(entityId);
+      const installed = cleanAndValidateVersion(versionEntityAttributes.attributes.installed_version);
+      const latest = cleanAndValidateVersion(versionEntityAttributes.attributes.latest_version);
+
+      return { installed, latest };
+    }
+    catch {
       return { installed: null, latest: null };
     }
-
-    const versionEntityAttributes = this.getState(entityId);
-    const installed = cleanAndValidateVersion(versionEntityAttributes.attributes.installed_version);
-    const latest = cleanAndValidateVersion(versionEntityAttributes.attributes.latest_version);
-
-    return { installed, latest };
   }
 
   public getHomeAssistantVersions(): SoftwareVersion {

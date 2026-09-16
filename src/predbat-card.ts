@@ -1,4 +1,4 @@
-import { cardHeight, htmlPlanEntity } from './constants';
+import { cardHeight, htmlPlanEntity, restApiPort } from './constants';
 import { configForm } from './schemas/configForm';
 import { HomeAssistantService } from './services/home-assistant-service';
 import { WeatherService } from './services/weather-service';
@@ -8,16 +8,18 @@ import { TableRenderer } from './utils/TableRenderer';
 import { tableStyles } from './styles/table-styles';
 import { modalStyles } from './styles/modal-styles';
 import { divElement, getVersionRowElement, haCardElement, styleElement, toggleCarCharging, toggleGeneratingPlan } from './utils/html-utils';
-import { PredbatService } from './services/predbat-service';
+import { PredbatRestApiService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
+import { PredbatRawDataSchema, RawData } from './schemas/predbat';
 
 class PredbatTableCard extends HTMLElement {
   private _haService = new HomeAssistantService();
-  private _predbatService: PredbatService | null = null;
+  private _predbatService: PredbatRestApiService | null = null;
   private _configManager: ConfigManager = new ConfigManager();
   private _tableRenderer: TableRenderer = new TableRenderer(this._configManager);
   private _weatherService = new WeatherService();
   private _planData: PredbatData | null = null;
+  private _restApiAvailable: boolean | null = null;
 
   // reactive data
   private _reactiveDataState: { overrides: string | null, generatingPlan: boolean, carCharging: 'on' | 'off' | undefined } = {
@@ -51,7 +53,13 @@ class PredbatTableCard extends HTMLElement {
       this._predbatService = null;
     }
 
-    this._predbatService = new PredbatService(5052, this.setPlanData);
+    PredbatRestApiService.restApiAvailable(restApiPort)
+      .then((restApiAvailable) => {
+        this._restApiAvailable = restApiAvailable;
+
+        if (restApiAvailable) this._predbatService = new PredbatRestApiService(restApiPort, this.setPlanData);
+      })
+      .catch(() => this._restApiAvailable = false);
   }
 
   // * New state received from Home Assistant
@@ -74,6 +82,18 @@ class PredbatTableCard extends HTMLElement {
       this._reactiveDataState.generatingPlan = this._haService.generatingPlan;
 
       toggleGeneratingPlan(this, this._haService.generatingPlan);
+
+      this._render();
+    }
+
+    // Get data from state if no REST API is available
+    if (this._restApiAvailable === false) {
+      const validatedHistoricPlanData: RawData = PredbatRawDataSchema.parse({});
+      const validatedPlanData: RawData = PredbatRawDataSchema.parse({});
+
+      const newPlanData = new PredbatData(validatedHistoricPlanData, validatedPlanData);
+
+      this.setPlanData(newPlanData);
 
       this._render();
     }

@@ -5,15 +5,16 @@ export declare const process: {
   };
 };
 
+import { PredbatData } from '../PredbatData';
 import { HassEntity, HistoryStateArraySchema } from '../schemas/home-assistant';
+import { PredbatRawDataSchema } from '../schemas/predbat';
 import type { EntityObject, HistoryState, HomeAssistant, SoftwareVersion, Sun } from '../types/home-assistant';
 import { cleanAndValidateVersion } from '../utils/general-utils';
-import { PredbatData } from '../PredbatData';
 
 export class HomeAssistantService {
   private _hass: HomeAssistant | null = null;
-  private _predbatData: PredbatData | null = null;
   private _dayLimit: number | null = null;
+  private _lastPlanUpdated: string | null = null;
 
   // Accept new HomeAssistant data
   public set hass(newHass: HomeAssistant) {
@@ -68,10 +69,19 @@ export class HomeAssistantService {
     return this._hass.states;
   }
 
-  public get predbatData(): PredbatData {
-    if (this._predbatData === null) throw new Error('this._predbatData is null');
+  public get predbatData(): PredbatData | null {
+    const planHtml = this._hass?.states['predbat.plan_html'];
+    const historicEntity = this._hass?.states['predbat.cost_yesterday'];
 
-    return this._predbatData;
+    if (planHtml === undefined) throw new Error('predbat.plan_html from HASS is undefined');
+    if (historicEntity === undefined) throw new Error('predbat.cost_yesterday from HASS is undefined');
+
+    if (planHtml.last_updated === this._lastPlanUpdated) return null;
+
+    const validatedPlanData = PredbatRawDataSchema.parse(planHtml.attributes.raw);
+    const validatedHistoricPlanData = PredbatRawDataSchema.parse(historicEntity.attributes.json);
+
+    return new PredbatData(validatedHistoricPlanData, validatedPlanData);
   }
 
   private async _callService(domain: string, service: string, entity_id: string, option: string): Promise<void> {

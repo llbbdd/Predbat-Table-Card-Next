@@ -10,16 +10,16 @@ import { modalStyles } from './styles/modal-styles';
 import { divElement, getVersionRowElement, haCardElement, styleElement, toggleCarCharging, toggleGeneratingPlan } from './utils/html-utils';
 import { PredbatRestApiService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
-import { PredbatRawDataSchema, RawData } from './schemas/predbat';
 
 class PredbatTableCard extends HTMLElement {
   private _haService = new HomeAssistantService();
-  private _predbatService: PredbatRestApiService | null = null;
+  private _predbatRestApiService: PredbatRestApiService | null = null;
   private _configManager: ConfigManager = new ConfigManager();
   private _tableRenderer: TableRenderer = new TableRenderer(this._configManager);
   private _weatherService = new WeatherService();
   private _planData: PredbatData | null = null;
   private _restApiAvailable: boolean | null = null;
+  private _lastPlanUpdated: string | null = null;
 
   // reactive data
   private _reactiveDataState: { overrides: string | null, generatingPlan: boolean, carCharging: 'on' | 'off' | undefined } = {
@@ -48,16 +48,16 @@ class PredbatTableCard extends HTMLElement {
 
     this._reactiveDataState.carCharging = this._configManager.carChargeSwitch;
 
-    if (this._predbatService) {
-      this._predbatService.disconnect();
-      this._predbatService = null;
+    if (this._predbatRestApiService) {
+      this._predbatRestApiService.disconnect();
+      this._predbatRestApiService = null;
     }
 
     PredbatRestApiService.restApiAvailable(restApiPort)
       .then((restApiAvailable) => {
         this._restApiAvailable = restApiAvailable;
 
-        if (restApiAvailable) this._predbatService = new PredbatRestApiService(restApiPort, this.setPlanData);
+        if (restApiAvailable) this._predbatRestApiService = new PredbatRestApiService(restApiPort, this.setPlanData);
       })
       .catch(() => this._restApiAvailable = false);
   }
@@ -88,14 +88,21 @@ class PredbatTableCard extends HTMLElement {
 
     // Get data from state if no REST API is available
     if (this._restApiAvailable === false) {
-      const validatedHistoricPlanData: RawData = PredbatRawDataSchema.parse({});
-      const validatedPlanData: RawData = PredbatRawDataSchema.parse({});
+      const planEntity = hass.states['predbat.plan_html'];
 
-      const newPlanData = new PredbatData(validatedHistoricPlanData, validatedPlanData);
+      if (planEntity !== undefined && planEntity.last_updated !== this._lastPlanUpdated) {
+        const predbatData = this._haService.predbatData;
 
-      this.setPlanData(newPlanData);
+        if (predbatData !== null) {
+          this.setPlanData(predbatData);
+          this._lastPlanUpdated = planEntity.last_updated;
 
-      this._render();
+          this._render();
+        }
+      }
+      else {
+        // skip rendering
+      }
     }
   }
 
@@ -157,11 +164,13 @@ class PredbatTableCard extends HTMLElement {
 
     this._tableRenderer.container = tableOuterContainer;
     this._tableRenderer.onUpdate = (): void => {
-      if (this._predbatService) this._render();
+      if (this._predbatRestApiService) this._render();
     };
     this._weatherService.onUpdate = (): void => {
-      if (this._predbatService) this._render();
+      if (this._predbatRestApiService) this._render();
     };
+
+    this._render();
   }
 
   // * Lifecycle - Card component removed from DOM
@@ -170,9 +179,9 @@ class PredbatTableCard extends HTMLElement {
       await this._weatherService.unsubscribe();
     }
 
-    if (this._predbatService) {
-      this._predbatService.disconnect();
-      this._predbatService = null;
+    if (this._predbatRestApiService) {
+      this._predbatRestApiService.disconnect();
+      this._predbatRestApiService = null;
     }
   }
 
@@ -198,7 +207,10 @@ class PredbatTableCard extends HTMLElement {
   };
 
   private _render(): void {
-    if (this._predbatService === null) {
+    if (
+      this._restApiAvailable === null ||
+      (this._restApiAvailable && this._predbatRestApiService === null)
+    ) {
       // Predbat service is initialising
       this._tableRenderer.renderInfo('Initializing Predbat service...');
 

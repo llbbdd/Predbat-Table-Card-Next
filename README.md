@@ -2,6 +2,8 @@
 
 Predbat Table Card is a custom Home Assistant card that displays your [Predbat](https://github.com/springfall2008/batpred) energy management plan in a clean, compact table format. It provides an overview of your solar, battery, and grid interactions across 30-minute intervals, including import/export rates, PV forecasts, load consumption, battery state of charge, and cost tracking. The card supports dynamic column visibility, responsive layouts for mobile, tablets and desktop, and override controls for manual demand/charge/export management. It provides an intuitive way to monitor and control your Predbat energy system directly from your dashboard.
 
+Works with Predbat installed as a HAOS app, or as a Docker container.
+
 ![Table Image](images/table.png)
 
 My system doesn't have all the features Predbat supports, which means I can't test it 100%, so feel free to feed back any problems you find. Thanks.
@@ -34,7 +36,7 @@ If you prefer to install the card manually or are not using HACS, you can follow
     - In your Home Assistant dashboard, go to **Settings** → **Dashboards**.
     - Click the three-dot menu (⋮) and select **Resources**.
     - Click **Add Resource**.
-    - Enter the URL: `/local/Predbat-Table-Card-Next.js?v=1.0.0` (replace `1.0.0` with the version you downloaded).
+    - Enter the URL: `/local/Predbat-Table-Card-Next.js?v=1.0.0` (replace `1.0.0` with the version you downloaded, and remember to update when upgrading).
     - Select **JavaScript Module** as the resource type and click **Create**.
 
 4.  **Add the card to your dashboard**:

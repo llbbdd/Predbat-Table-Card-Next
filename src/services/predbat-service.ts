@@ -1,7 +1,8 @@
+import { PredbatData } from '../PredbatData';
 import { RawData, PredbatRawDataSchema } from '../schemas/predbat';
 
 export class PredbatService {
-  private _dataCallback: ((validatedHistoricPlanData: RawData, validatedPlanData: RawData) => void) | null;
+  private _dataCallback: ((predbatData: PredbatData) => void) | null;
   private _portRestApi: number;
   private _updateIntervalRestApi: ReturnType<typeof setInterval> | null = null;
   private _retryTimeoutRestApi: ReturnType<typeof setTimeout> | null = null;
@@ -9,7 +10,7 @@ export class PredbatService {
   private _fetchInProgressRestApi = false;
   private _dataSource: 'REST_API' | 'HASS_STATES' | null = null;
 
-  public constructor(port: number, dataCallback: (validatedHistoricPlanData: RawData, validatedPlanData: RawData) => void) {
+  public constructor(port: number, dataCallback: (predbatData: PredbatData) => void) {
     this._portRestApi = port;
     this._dataCallback = dataCallback;
 
@@ -58,7 +59,7 @@ export class PredbatService {
 
           if (this._dataCallback === null) throw new Error('this._dataCallback is null');
 
-          this._dataCallback(validatedHistoricPlanData, validatedPlanData);
+          this._dataCallback(new PredbatData(validatedHistoricPlanData, validatedPlanData));
         }
         catch (error) {
           console.error(error);

@@ -10,7 +10,6 @@ import { modalStyles } from './styles/modal-styles';
 import { divElement, getVersionRowElement, haCardElement, styleElement, toggleCarCharging, toggleGeneratingPlan } from './utils/html-utils';
 import { PredbatService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
-import { RawData } from './schemas/predbat';
 
 class PredbatTableCard extends HTMLElement {
   private _haService = new HomeAssistantService();
@@ -172,8 +171,8 @@ class PredbatTableCard extends HTMLElement {
     });
   }
 
-  public setPlanData = (validatedHistoricPlanData: RawData, validatedPlanData: RawData): void => {
-    this._planData = new PredbatData(validatedHistoricPlanData, validatedPlanData);
+  public setPlanData = (planData: PredbatData): void => {
+    this._planData = planData;
 
     this._render();
   };

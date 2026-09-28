@@ -9,6 +9,7 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false,
     "emitDecoratorMetadata": true,
+    "skipLibCheck": true
   },
   "include": [
     "src/**/*",

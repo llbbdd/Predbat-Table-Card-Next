@@ -20,9 +20,8 @@ export class TableRenderer {
   // Column groupings - defined once here
   private readonly _columnGroups = {
     energy: ['pv-column', 'load-column', 'net-energy-column', 'car-column', 'iboost-column', 'clip-column', 'xload-column'],
-    price: ['import-column', 'export-column'],
+    price: ['import-column', 'export-column', 'cost-column', 'total-column'],
     percentage: ['soc-column', 'limit-column'],
-    cost: ['cost-column', 'total-column'],
     co2: ['co2kg-column']
   };
 

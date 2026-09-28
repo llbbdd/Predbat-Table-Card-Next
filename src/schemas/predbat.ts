@@ -208,7 +208,12 @@ const TotalsSchema = z.object({
 
 // Main raw data schema
 export const PredbatRawDataSchema = z.object({
-  rows: z.array(RawRowSchema),
+  rows: z.array(RawRowSchema).transform((rows) =>
+    rows.map((row) => ({
+      ...row,
+      cost_change: row.cost_change * 100 // ASK - predbat bug - convert pounds to pence
+    }))
+  ),
   import_cost_threshold: z.number(),
   export_cost_threshold: z.number(),
   currency_symbols: z.tuple([z.string(), z.string()]),

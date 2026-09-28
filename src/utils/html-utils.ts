@@ -408,10 +408,10 @@ export function barElement(value: number, maxValue: number, colour: string, inve
   const percentage = Math.min(Math.max((absValue / maxValue) * 100, 0), 100);
 
   let barColour: string;
-  const badColour = '#f00';
+  const negativeColour = inverted ? '#f00' : '#0f0';
 
   if (isNegative) {
-    barColour = badColour;
+    barColour = negativeColour;
   }
   else if (inverted) {
     const green = Math.round((percentage / 100) * 255);
@@ -430,9 +430,9 @@ export function barElement(value: number, maxValue: number, colour: string, inve
   barFill.style.width = `${percentage}%`;
   barFill.style.background = barColour;
   barFill.style.opacity = isNegative ? '0.25' : '0.3';
-  if (isNegative) barFill.style.borderLeft = `2px solid ${badColour}`;
+  if (isNegative) barFill.style.borderLeft = `2px solid ${negativeColour}`;
 
-  const valueText = spanElement('bar-element-value', isNegative ? badColour : 'var(--primary-text-color, #000)', value === 0 && hideZero ? undefined : value);
+  const valueText = spanElement('bar-element-value', isNegative ? negativeColour : 'var(--primary-text-color, #000)', value === 0 && hideZero ? undefined : value);
 
   container.appendChild(barFill);
   container.appendChild(valueText);

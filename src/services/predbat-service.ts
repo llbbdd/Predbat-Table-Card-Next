@@ -113,14 +113,18 @@ export class PredbatRestApiService {
 
   public static restApiAvailable(port: number): Promise<boolean> {
     return fetch(`http://${window.location.hostname}:${port}/api/plan_data`)
-      .then((response): boolean => {
+      .then(async (response) => {
+        if (!response.ok) {
+          console.info('Using HASS state for Predbat data (response error)');
+
+          return false;
+        }
+
+        await response.json();
+
         console.info('Using REST API for Predbat data');
 
-        if (response.ok) return true;
-
-        console.info('Using HASS state for Predbat data (response error)');
-
-        return false;
+        return true;
       })
       .catch(() => {
         console.info('Using HASS state for Predbat data (fetch error)');

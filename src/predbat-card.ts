@@ -212,7 +212,7 @@ class PredbatTableCard extends HTMLElement {
       (this._restApiAvailable && this._predbatRestApiService === null)
     ) {
       // Predbat service is initialising
-      this._tableRenderer.renderInfo('Initializing Predbat service...');
+      this._tableRenderer.renderInfo('Initialising Predbat service...');
 
       return;
     }

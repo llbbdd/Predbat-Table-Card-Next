@@ -246,12 +246,23 @@ export class TableRenderer {
 
               break;
             }
+            ////
+            case 'cost-column': {
+              if (typeof columnData.value !== 'number') throw new Error('Invalid cost-column data' + columnData.value);
+
+              const maxValue = this._getColumnGroupMax(column, predbatData.plan);
+              const roundedValue = Math.round(columnData.value);
+
+              cellInner.appendChild(barElement(roundedValue, maxValue, columnData.colour, false, false));
+
+              break;
+            }
             default: {
               if (typeof columnData.value === 'number') {
                 const maxValue = this._getColumnGroupMax(column, predbatData.plan);
                 const invertBarColour = column === 'pv-column' || column === 'net-energy-column'; // low value is green, high is red; invert for low value is red, high is green
 
-                cellInner.appendChild(barElement(columnData.value, maxValue, columnData.colour, invertBarColour, column !== 'cost-column'));
+                cellInner.appendChild(barElement(columnData.value, maxValue, columnData.colour, invertBarColour, true));
               }
               else {
                 cellInner.style.color = columnData.colour;

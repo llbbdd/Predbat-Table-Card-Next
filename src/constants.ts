@@ -33,8 +33,8 @@ export const allColumns = [
   'state-column',
   'load-column',
   'xload-column',
-  'clip-column',// TODO - render clip column
-  'car-column',// TODO - render car column
+  'clip-column',
+  'car-column',
   'iboost-column',
   'co2kg-column',
   'cost-column',

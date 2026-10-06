@@ -241,8 +241,14 @@ export class PredbatData {
           const rowData = row[columnWithTotal as keyof PredbatRowData];
 
           if (rowData && typeof rowData.value === 'number') {
-            const currentTotal = tempTotals[columnWithTotal] ?? 0;
-            tempTotals[columnWithTotal] = currentTotal + rowData.value;
+            if (columnWithTotal === 'iboost-column') {
+              // iBoost is a running total per slot, so the day's total is the last value recorded, not the sum of every slot.
+              tempTotals[columnWithTotal] = rowData.value;
+            }
+            else {
+              const currentTotal = tempTotals[columnWithTotal] ?? 0;
+              tempTotals[columnWithTotal] = currentTotal + rowData.value;
+            }
           }
         }
       });

@@ -176,7 +176,6 @@ export class PredbatData {
           value: row.clipped,
           colour: row.clipped_color
         },
-        // ASK - how is predicted iBoost calculated? looks like final calculated value is just repeated, meaning net power and daily total is meaningless
         'iboost-column': {
           value: row.iboost ?? 0,
           colour: white

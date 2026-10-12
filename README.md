@@ -8,8 +8,6 @@ Works with Predbat installed as a HAOS app, or as a Docker container.
 
 My system doesn't have all the features Predbat supports, which means I can't test it 100%, so feel free to feed back any problems you find. Thanks.
 
-Inpired by the original, but now abandoned, predbat-table-card.
-
 ## HACS Installation (addition to HACS is currently under review - use manual install process for now)
 
 1. Open HACS

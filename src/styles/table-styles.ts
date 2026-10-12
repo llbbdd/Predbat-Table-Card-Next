@@ -260,8 +260,7 @@ export const tableStyles = `
   }
 
   /* Right column - last cell gets right border */
-  .table-right-column .current-time td[data-column="overrides-popup-column"],
-  .table-right-column .current-time td[data-column="overrides-column"] {
+  .table-right-column .current-time td:last-child {
     border-right: 3px solid var(--primary-color);
   }
 

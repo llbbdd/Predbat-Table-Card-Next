@@ -34,15 +34,15 @@ export class WeatherService {
     const endIndex = Math.min(startIndex + totalHours, this._forecast.length);
     const result = new Map<string, WeatherRowData>();
 
-    for (let i = startIndex; i < endIndex; i++) {
-      const tempUnit = this.temperatureUnit;
+    const tempUnit = this.temperatureUnit;
 
-      const weatherColour = ((): string => {
-        if (tempUnit === '°C') {
-          return getColourFromScale(-10, 40, this._forecast[i].temperature.toFixed(1), 'redToBlue', true);
-        }
-        return getColourFromScale(14, 104, this._forecast[i].temperature.toFixed(1), 'redToBlue');
-      })();
+    for (let i = startIndex; i < endIndex; i++) {
+      const item = this._forecast[i];
+      const temp = item.temperature.toFixed(1);
+
+      const weatherColour = tempUnit === '°C'
+        ? getColourFromScale(-10, 40, temp, 'redToBlue', true)
+        : getColourFromScale(14, 104, temp, 'redToBlue');
 
       result.set(this._forecast[i].datetime.toString(), {
         'weather-column': { value: this._forecast[i].condition, colour: white },
@@ -114,9 +114,7 @@ export class WeatherService {
     return this._forecast !== null;
   }
 
-  public get temperatureUnit(): TemperatureUnit {
-    if (this._temperatureUnit === null) throw new Error('this._temperatureUnit is null');
-
+  public get temperatureUnit(): TemperatureUnit | null {
     return this._temperatureUnit;
   }
 

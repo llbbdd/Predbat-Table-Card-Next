@@ -51,7 +51,7 @@ export class TableRenderer {
     this._state = state;
   }
 
-  public render(predbatData: PredbatData, temperatureUnit: TemperatureUnit, dayLimit: number, generatingPlan: boolean, carChargeSwitch: 'on' | 'off' | undefined, forceEntityObjects: EntityObject[], weather: Map<string, WeatherRowData> | null): void {
+  public render(predbatData: PredbatData, temperatureUnit: TemperatureUnit | null, dayLimit: number, generatingPlan: boolean, carChargeSwitch: 'on' | 'off' | undefined, forceEntityObjects: EntityObject[], weather: Map<string, WeatherRowData> | null): void {
     if (this._container === null) return;
 
     const leftColumn = divElement('table-left-column');
@@ -233,6 +233,7 @@ export class TableRenderer {
             ////
             case 'temp-column': {
               if (typeof columnData.value !== 'number') throw new Error('Invalid temp-column data' + columnData.value);
+              if(temperatureUnit === null) throw new Error('temperatureUnit must have a value to render temp-column'); // this error should be impossible due to the column being excluded for having no data
 
               cellInner.appendChild(temperatureElement(columnData.value, columnData.colour, temperatureUnit));
 

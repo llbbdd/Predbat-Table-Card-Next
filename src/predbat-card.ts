@@ -48,18 +48,7 @@ class PredbatTableCard extends HTMLElement {
 
     this._reactiveDataState.carCharging = this._configManager.carChargeSwitch;
 
-    if (this._predbatRestApiService) {
-      this._predbatRestApiService.disconnect();
-      this._predbatRestApiService = null;
-    }
-
-    PredbatRestApiService.restApiAvailable(restApiPort)
-      .then((restApiAvailable) => {
-        this._restApiAvailable = restApiAvailable;
-
-        if (restApiAvailable) this._predbatRestApiService = new PredbatRestApiService(restApiPort, this.setPlanData);
-      })
-      .catch(() => this._restApiAvailable = false);
+    this._initialiseRestApi();
   }
 
   // * New state received from Home Assistant
@@ -170,6 +159,7 @@ class PredbatTableCard extends HTMLElement {
       if (this._predbatRestApiService) this._render();
     };
 
+    this._initialiseRestApi();
     this._render();
   }
 
@@ -183,6 +173,9 @@ class PredbatTableCard extends HTMLElement {
       this._predbatRestApiService.disconnect();
       this._predbatRestApiService = null;
     }
+
+    this._lastPlanUpdated = null;
+    this._planData = null;
   }
 
   // * Register card with Home Assistant
@@ -205,6 +198,29 @@ class PredbatTableCard extends HTMLElement {
 
     this._render();
   };
+
+  private _initialiseRestApi(): void {
+    if (this._predbatRestApiService) {
+      this._predbatRestApiService.disconnect();
+      this._predbatRestApiService = null;
+    }
+
+    this._restApiAvailable = null;
+
+    PredbatRestApiService.restApiAvailable(restApiPort)
+      .then((restApiAvailable) => {
+        this._restApiAvailable = restApiAvailable;
+
+        if (restApiAvailable) this._predbatRestApiService = new PredbatRestApiService(restApiPort, this.setPlanData);
+
+        this._render();
+      })
+      .catch(() => {
+        this._restApiAvailable = false;
+
+        this._render();
+      });
+  }
 
   private _render(): void {
     if (

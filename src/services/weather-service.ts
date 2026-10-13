@@ -156,6 +156,8 @@ export class WeatherService {
       await this._unsubscribeWeather();
       this._unsubscribeWeather = null;
     }
+
+    this._forecast = null;
   }
 
   public set connection(connection: Connection) {

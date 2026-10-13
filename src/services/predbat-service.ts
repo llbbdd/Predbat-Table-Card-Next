@@ -6,10 +6,10 @@ export class PredbatRestApiService {
   private _dataCallback: ((predbatData: PredbatData) => void) | null;
   private _port: number;
   private _updateInterval: ReturnType<typeof setInterval> | null = null;
-  private _retryTimeout: ReturnType<typeof setTimeout> | null = null;
+  private _retryTimeout: ReturnType<typeof setInterval> | null = null;
+  private _initialUpdateTimeout: ReturnType<typeof setTimeout> | null = null;
   private _isAvailable = false;
   private _fetchInProgress = false;
-  private _dataSource: 'REST_API' | 'HASS_STATES' | null = null;
 
   public constructor(port: number, dataCallback: (predbatData: PredbatData) => void) {
     this._port = port;
@@ -94,7 +94,8 @@ export class PredbatRestApiService {
     nextUpdate.setHours(nextHour, nextMinute, 0, 0);
     const delay = nextUpdate.getTime() - now.getTime() + 5000;
 
-    setTimeout(() => {
+    this._initialUpdateTimeout = setTimeout(() => {
+      this._initialUpdateTimeout = null;
       this._fetchData();
       this._updateInterval = setInterval(() => {
         this._fetchData();
@@ -145,6 +146,12 @@ export class PredbatRestApiService {
       this._updateInterval = null;
     }
 
+    if (this._initialUpdateTimeout) {
+      clearTimeout(this._initialUpdateTimeout);
+      this._initialUpdateTimeout = null;
+    }
+
+    this._dataCallback = null;
     this._isAvailable = false;
   }
 }

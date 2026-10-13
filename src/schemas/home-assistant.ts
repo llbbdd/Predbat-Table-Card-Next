@@ -16,10 +16,22 @@ export type ValidEntityId = z.infer<typeof ValidEntityIdSchema>;
 export const ColumnKeySchema = z.enum(allColumns);
 export type ColumnKey = z.infer<typeof ColumnKeySchema>;
 
+const validColumns = new Set<string>(allColumns);
+
 export const PredbatTableCardConfigSchema = z.object({
   // Required
   type: z.literal('custom:predbat-card-next'),
-  columns: z.array(ColumnKeySchema),
+  columns: z
+    .array(z.string())
+    .transform((columns) =>
+      columns.filter((column): column is ColumnKey => {
+        if (validColumns.has(column)) return true;
+
+        console.warn(`Unknown column "${column}" — ignoring. Valid values: ${allColumns.join(', ')}`);
+
+        return false;
+      })
+    ),
 
   // Optional with defaults
   grid_options: z.object({

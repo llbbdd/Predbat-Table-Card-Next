@@ -1,6 +1,7 @@
 import isSemver from 'is-semver';
 import { weekdayArray, weekdayMap } from '../constants';
 import type { CellValue, WeekdayKey } from '../types/home-assistant';
+import { logger } from './logger';
 
 export function invalidDay(labelDayStr: string): boolean {
   if (!weekdayArray.includes(labelDayStr)) return true;
@@ -71,7 +72,7 @@ export function cleanAndValidateVersion(version: string | undefined): string | n
   const cleaned = trimmed.startsWith('v') ? trimmed.slice(1) : trimmed;
 
   if (!isSemver(cleaned)) {
-    console.warn(`Invalid version format: ${version}`);
+    logger.warn(`Invalid version format: ${version}`);
 
     return null;
   }
@@ -231,8 +232,6 @@ export function isWithinLastHalfHour(dateString: string): void {
   const dateToCheck = Temporal.PlainDateTime.from(dateString);
 
   if (Temporal.PlainDateTime.compare(dateToCheck, thirtyMinutesAgo) < 0) {
-    console.error(
-      `Predbat has not returned full history data. Expected data from ${thirtyMinutesAgo.toString()}, but latest received is ${dateToCheck.toString()}`
-    );
+    logger.error(`Predbat has not returned full history data. Expected data from ${thirtyMinutesAgo.toString()}, but latest received is ${dateToCheck.toString()}`);
   }
 }

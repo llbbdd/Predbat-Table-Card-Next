@@ -1,5 +1,6 @@
 import { ColumnKey, PredbatTableCardConfigSchema } from '../schemas/home-assistant';
 import { PredbatTableCardConfig } from '../types/home-assistant';
+import { logger } from './logger';
 
 export class ConfigManager {
   private _config: PredbatTableCardConfig | null;
@@ -14,8 +15,8 @@ export class ConfigManager {
 
       this._config = validatedConfig;
     }
-    catch(error) {
-      console.error(error);
+    catch (error) {
+      logger.error(error);
     }
   }
 

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { allColumns, htmlPlanEntity } from '../constants';
+import { logger } from '../utils/logger';
 
 const HistoryStateSchema = z.object({
   state: z.string(),
@@ -27,7 +28,7 @@ export const PredbatTableCardConfigSchema = z.object({
       columns.filter((column): column is ColumnKey => {
         if (validColumns.has(column)) return true;
 
-        console.warn(`Unknown column "${column}" — ignoring. Valid values: ${allColumns.join(', ')}`);
+        logger.warn(`Unknown column "${column}" — ignoring. Valid values: ${allColumns.join(', ')}`);
 
         return false;
       })

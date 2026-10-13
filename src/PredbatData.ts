@@ -3,6 +3,7 @@ import { ColumnKey } from './schemas/home-assistant';
 import { PredbatRowData, RawData } from './schemas/predbat';
 import { change } from './utils/entity-utils';
 import { getColourFromScale } from './utils/general-utils';
+import { logger } from './utils/logger';
 
 export class PredbatData {
   private _plan: Map<string, PredbatRowData | null> | null = null;
@@ -77,7 +78,7 @@ export class PredbatData {
         keyToUse = roundedTemporal.toString();
 
         if (newPlan.has(keyToUse)) {
-          console.warn(`Skipping off-half-hour entry ${timeString} (collides with ${keyToUse})`);
+          logger.warn(`Skipping off-half-hour entry ${timeString} (collides with ${keyToUse})`);
 
           continue;
         }
@@ -96,13 +97,13 @@ export class PredbatData {
           while (Temporal.PlainDateTime.compare(fillTime, currentModifiedTime) < 0) {
             const fillKey = fillTime.toString();
 
-            console.warn(`Gap detected: ${diffMinutes} minutes between ${lastKey} and ${keyToUse} - Filling missing slot: ${fillKey} with null`);
+            logger.warn(`Gap detected: ${diffMinutes} minutes between ${lastKey} and ${keyToUse} - Filling missing slot: ${fillKey} with null`);
             newPlan.set(fillKey, null);
             fillTime = fillTime.add({ minutes: 30 });
           }
         }
         else if (diffMinutes !== 30) {
-          console.warn(`Skipping ${keyToUse}: not 30 minutes after ${lastKey} (${diffMinutes} minutes)`);
+          logger.warn(`Skipping ${keyToUse}: not 30 minutes after ${lastKey} (${diffMinutes} minutes)`);
 
           continue;
         }

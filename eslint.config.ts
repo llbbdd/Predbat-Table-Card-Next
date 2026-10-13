@@ -75,7 +75,8 @@ export default defineConfig([
       "@stylistic/indent": ["error", 2],
       "@stylistic/object-curly-spacing": ["error", "always"],
       "@stylistic/comma-dangle": ["error", "never"],
-      "@stylistic/space-before-blocks": ["error", "always"]
+      "@stylistic/space-before-blocks": ["error", "always"],
+      "no-console": "error"
     },
   },
   {

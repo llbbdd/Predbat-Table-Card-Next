@@ -241,7 +241,7 @@ class PredbatTableCard extends HTMLElement {
       this._weatherService.getWeatherData(this._configManager.dayLimit)
     );
   }
-
+  // TODO - change cost column to pounds
   private _getOverrideStateString(): string {
     const overrideEntities = this._haService.getOverrideEntities();
 

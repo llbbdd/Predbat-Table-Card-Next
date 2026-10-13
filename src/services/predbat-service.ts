@@ -1,5 +1,6 @@
 import { PredbatData } from '../PredbatData';
 import { RawData, PredbatRawDataSchema } from '../schemas/predbat';
+import { logger } from '../utils/logger';
 
 export class PredbatRestApiService {
   private _dataCallback: ((predbatData: PredbatData) => void) | null;
@@ -39,7 +40,7 @@ export class PredbatRestApiService {
     this._getPlanData(this._port)
       .then((planData) => {
         if (planData?.yesterday === undefined) {
-          console.warn('No data received from Predbat API');
+          logger.warn('No data received from Predbat API');
 
           return;
         }
@@ -53,11 +54,11 @@ export class PredbatRestApiService {
           this._dataCallback(new PredbatData(validatedHistoricPlanData, validatedPlanData));
         }
         catch (error) {
-          console.error(error);
+          logger.error(error);
         }
 
         if (!this._isAvailable) {
-          console.info('Successfully fetched Predbat API data');
+          logger.info('Successfully fetched Predbat API data');
 
           this._isAvailable = true;
           this._scheduleHalfHourUpdate(5);
@@ -65,13 +66,13 @@ export class PredbatRestApiService {
       })
       .catch((error) => {
         if (this._isAvailable) {
-          console.warn('Predbat API request failed, will retry...', error.message);
+          logger.warn('Predbat API request failed, will retry...', error.message);
 
           this._isAvailable = false;
           this._startPolling();
         }
         else {
-          console.error('Predbat is unreachable');
+          logger.error('Predbat is unreachable');
         }
       })
       .finally(() => {
@@ -115,19 +116,19 @@ export class PredbatRestApiService {
     return fetch(`http://${window.location.hostname}:${port}/api/plan_data`)
       .then(async (response) => {
         if (!response.ok) {
-          console.info('Using HASS state for Predbat data (response error)');
+          logger.info('Using HASS state for Predbat data (response error)');
 
           return false;
         }
 
         await response.json();
 
-        console.info('Using REST API for Predbat data');
+        logger.info('Using REST API for Predbat data');
 
         return true;
       })
       .catch(() => {
-        console.info('Using HASS state for Predbat data (fetch error)');
+        logger.info('Using HASS state for Predbat data (fetch error)');
 
         return false;
       });

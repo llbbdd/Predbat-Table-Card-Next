@@ -4,6 +4,7 @@ import { ForecastSubscriptionError } from '../utils/ForecastSubscriptionError';
 import { maxWeatherSubscriptionRetries, weekdayMap, white } from '../constants';
 import { getColourFromScale, invalidDay } from '../utils/general-utils';
 import { WeatherAttributesSchema, WeatherForecastArray, WeatherForecastArraySchema, WeatherForecastItem } from '../schemas/weather';
+import { logger } from '../utils/logger';
 
 export type WeatherRowData = {
   'weather-column': { value: string, colour: string } | null;
@@ -56,7 +57,7 @@ export class WeatherService {
 
   public async subscribe(weatherEntityId: string | undefined): Promise<void> {
     if (weatherEntityId === undefined) {
-      console.info('No weather forecast entity configured');
+      logger.info('No weather forecast entity configured');
     }
     else {
       // Prevent multiple subscription attempts
@@ -74,7 +75,7 @@ export class WeatherService {
           throw new Error('throw new Error(`Failed to subscribe to forecast - connection not available after ${maxWeatherSubscriptionRetries} attempts`);');
         }
 
-        console.info(`Waiting for hass connection... attempt ${attempts}/${maxWeatherSubscriptionRetries} (waiting ${delayMs}ms)`);
+        logger.info(`Waiting for hass connection... attempt ${attempts}/${maxWeatherSubscriptionRetries} (waiting ${delayMs}ms)`);
 
         await new Promise(resolve => setTimeout(resolve, delayMs));
       }
@@ -96,13 +97,13 @@ export class WeatherService {
           }
         );
 
-        console.info('Weather forecast subscription successful');
+        logger.info('Weather forecast subscription successful');
       }
       catch (error) {
         const forecastSubscriptionError = error as ForecastSubscriptionError;
 
         if (forecastSubscriptionError.code !== 'invalid_format') {
-          console.error('Failed to subscribe to forecast:', forecastSubscriptionError);
+          logger.error('Failed to subscribe to forecast:', forecastSubscriptionError);
         }
 
         throw new Error('Failed to subscribe to forecast - Correct the entity value and refresh');

@@ -2,6 +2,7 @@ import z from 'zod';
 import { Temporal } from '@js-temporal/polyfill';
 import { fixTimezoneOffset, dateStringHasTimezoneOffset as stringHasTimezoneOffset } from '../utils/general-utils';
 import { dayStart } from '../constants';
+import { logger } from '../utils/logger';
 
 const UTCDateSchema = z.preprocess(
   (val) => {
@@ -62,7 +63,7 @@ const resultsToTemporalMap = (results: Record<string, number>): Map<Temporal.Pla
       }
     }
     catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 

@@ -1103,9 +1103,11 @@ function displayColour(rgb: string, label: string): void {
     const b = parseInt(match[3]);
     const bgColour = `\x1b[48;2;${r};${g};${b}m`;
     const reset = '\x1b[0m';
+    // eslint-disable-next-line no-console
     console.info(`${bgColour}  ${label.padEnd(22)} ${rgb}  ${reset}`);
   }
   else {
+    // eslint-disable-next-line no-console
     console.info(`${label.padEnd(22)} ${rgb}`);
   }
 }

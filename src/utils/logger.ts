@@ -23,5 +23,5 @@ export const logger = {
   },
   error: (...args: unknown[]): void => {
     console.error(prefix, LABEL_STYLE, ...args);
-  },
+  }
 };

@@ -33,6 +33,7 @@ export const PredbatTableCardConfigSchema = z.object({
         return false;
       })
     ),
+  entity: z.string().optional().default(htmlPlanEntity),
 
   // Optional with defaults
   grid_options: z.object({

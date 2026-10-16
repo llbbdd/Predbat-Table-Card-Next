@@ -1,4 +1,4 @@
-import { cardHeight, htmlPlanEntity, restApiPort } from './constants';
+import { cardHeight, restApiPort } from './constants';
 import { configForm } from './schemas/configForm';
 import { HomeAssistantService } from './services/home-assistant-service';
 import { WeatherService } from './services/weather-service';
@@ -11,6 +11,8 @@ import { divElement, getVersionRowElement, haCardElement, styleElement, toggleCa
 import { PredbatRestApiService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
 
+type PlanStatus = 'waiting' | 'failed' | 'available';
+
 class PredbatTableCard extends HTMLElement {
   private _haService = new HomeAssistantService();
   private _predbatRestApiService: PredbatRestApiService | null = null;
@@ -18,7 +20,8 @@ class PredbatTableCard extends HTMLElement {
   private _tableRenderer: TableRenderer = new TableRenderer(this._configManager);
   private _weatherService = new WeatherService();
   private _planData: PredbatData | null = null;
-  private _restApiAvailable: boolean | null = null;
+  private _planStatus: PlanStatus = 'waiting';
+  private _restApiAvailable = false;
   private _lastPlanUpdated: string | null = null;
 
   // reactive data
@@ -57,6 +60,7 @@ class PredbatTableCard extends HTMLElement {
     this._weatherService.connection = hass.connection;
 
     if (this._configManager.weatherEntity !== undefined) this._weatherService.temperatureUnit = this._haService.getState(this._configManager.weatherEntity).attributes;
+
     this._weatherService.sun = this._haService.sun;
 
     this._tableRenderer.callSelectOptionService = this._haService.callSelectOptionService;
@@ -76,21 +80,33 @@ class PredbatTableCard extends HTMLElement {
     }
 
     // Get data from state if no REST API is available
-    if (this._restApiAvailable === false) {
-      const planEntity = hass.states['predbat.plan_html'];
+    if (!this._restApiAvailable) {
+      const planEntityState = hass.states[this._configManager.planEntity];
 
-      if (planEntity !== undefined && planEntity.last_updated !== this._lastPlanUpdated) {
-        const predbatData = this._haService.predbatData;
-
-        if (predbatData !== null) {
-          this.setPlanData(predbatData);
-          this._lastPlanUpdated = planEntity.last_updated;
-
+      if (planEntityState === undefined) {
+        // Config entity ID is valid, but HA has no state for it — Predbat hasn't produced a plan
+        if (this._planStatus !== 'failed') {
+          this._planStatus = 'failed';
           this._render();
         }
       }
       else {
-        // skip rendering
+        try {
+          const predbatData = this._haService.getPredbatData(planEntityState.entity_id);
+
+          if (predbatData !== null) {
+            this._planStatus = 'available';
+            this.setPlanData(predbatData);
+            this._lastPlanUpdated = planEntityState.last_updated;
+            this._render();
+          }
+        }
+        catch {
+          if (this._planStatus !== 'failed') {
+            this._planStatus = 'failed';
+            this._render();
+          }
+        }
       }
     }
   }
@@ -205,7 +221,7 @@ class PredbatTableCard extends HTMLElement {
       this._predbatRestApiService = null;
     }
 
-    this._restApiAvailable = null;
+    this._restApiAvailable = false;
 
     PredbatRestApiService.restApiAvailable(restApiPort)
       .then((restApiAvailable) => {
@@ -223,26 +239,20 @@ class PredbatTableCard extends HTMLElement {
   }
 
   private _render(): void {
-    if (
-      this._restApiAvailable === null ||
-      (this._restApiAvailable && this._predbatRestApiService === null)
-    ) {
-      // Predbat service is initialising
-      this._tableRenderer.renderInfo('Initialising Predbat service...');
+    if (this._planStatus === 'failed') {
+      this._tableRenderer.renderError('Predbat plan not available');
+
+      return;
+    }
+
+    if (this._planStatus === 'waiting') {
+      this._tableRenderer.renderInfo('Waiting for Predbat plan');
 
       return;
     }
 
     if (this._planData === null) {
-      // Plan data is loading
       this._tableRenderer.renderInfo('Loading Predbat plan data...');
-
-      return;
-    }
-
-    if (this._haService.getState(htmlPlanEntity).state === 'unavailable') {
-      // Home Assistant state is unavailable
-      this._tableRenderer.renderError('Predbat data not available...');
 
       return;
     }

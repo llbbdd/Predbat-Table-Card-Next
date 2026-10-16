@@ -51,6 +51,12 @@ export class ConfigManager {
     return this._config.car_charge_switch;
   }
 
+  public get planEntity(): string {
+    if (this._config === null) throw new Error('Config data not received');
+
+    return this._config.entity;
+  }
+
   public get weatherEntity(): string | undefined {
     if (this._config === null) throw new Error('Config data not received');
 

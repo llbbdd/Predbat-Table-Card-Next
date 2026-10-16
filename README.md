@@ -72,6 +72,7 @@ These config items can either be set in the YAML or the Home Assistant UI config
 |----------|----------|----------|
 | `type`   | YES    | `predbat-card-next`    |
 | `day_limit`    | YES    | See [Day Limit](#day-limit) |
+| `entity`    | NO    | See [Entity](#entity) |
 | `columns`    | YES    | See [Column Options](#column-options) |
 | `battery_lower_limit`    | NO    | See [Battery Lower Limit](#battery-lower-limit) |
 | `weather_entity`    | NO    | See [Weather Forecast](#weather-forecast) |
@@ -104,6 +105,10 @@ weather_entity: weather.forecast_home_2
 ## Day Limit
 
 Limits the number of days the plan returns. The plan will always show full days, so that daily totals are correct, but will only show a day if Predbat has import/export price data.
+
+## Entity
+
+Name of the entity holding the Predbat plan HTML. Defaults to the Predbat default of predbat.plan_html.
 
 ## Column Options
 

@@ -70,8 +70,12 @@ export const configForm = {
       },
       default: 0
     },
-    { name: 'weather_entity', selector: { entity: {} } }
-
+    { name: 'weather_entity', selector: { entity: {} } },
+    {
+      name: 'entity',
+      selector: { entity: {} },
+      default: 'predbat.plan_html'
+    }
   ],
   computeLabel: (schema: Schema): string | undefined => {
     switch (schema.name) {
@@ -83,6 +87,8 @@ export const configForm = {
         return 'Lower battery limit';
       case 'weather_entity':
         return 'Weather Entity';
+      case 'entity':
+        return 'Predbat Plan Entity';
     }
 
     return undefined;
@@ -97,6 +103,8 @@ export const configForm = {
         return 'Optional - Only used for bar colours to narrow scale for higher definition';
       case 'weather_entity':
         return 'Optional - Home Assistant entity to use for weather forecast';
+      case 'entity':
+        return 'Optional - Entity providing the Predbat plan (default: predbat.plan_html)';
     }
 
     return undefined;

@@ -348,10 +348,16 @@ export const tableStyles = `
 
   /* Error message card */
   .error-card {
+    display: flex;
+    width: 100%;
+    height: 300px;
+    justify-content: center;
+    align-items: center;
     background: var(--error-color);
     color: var(--text-primary-color);
     border-radius: 8px;
     padding: 16px;
+    text-align: center;
   }
 
   .error-card .error {

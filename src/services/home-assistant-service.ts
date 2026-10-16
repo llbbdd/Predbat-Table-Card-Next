@@ -69,11 +69,11 @@ export class HomeAssistantService {
     return this._hass.states;
   }
 
-  public get predbatData(): PredbatData | null {
-    const planHtml = this._hass?.states['predbat.plan_html'];
+  public getPredbatData(planEntity: string): PredbatData | null {
+    const planHtml = this._hass?.states[planEntity];
     const historicEntity = this._hass?.states['predbat.cost_yesterday'];
 
-    if (planHtml === undefined) throw new Error('predbat.plan_html from HASS is undefined');
+    if (planHtml === undefined) throw new Error(`${planEntity} from HASS is undefined`);
     if (historicEntity === undefined) throw new Error('predbat.cost_yesterday from HASS is undefined');
 
     if (planHtml.last_updated === this._lastPlanUpdated) return null;

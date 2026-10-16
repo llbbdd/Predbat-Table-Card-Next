@@ -1,3 +1,4 @@
+import z from 'zod';
 import { ColumnKey, PredbatTableCardConfigSchema } from '../schemas/home-assistant';
 import { PredbatTableCardConfig } from '../types/home-assistant';
 import { logger } from './logger';
@@ -11,12 +12,30 @@ export class ConfigManager {
 
   public set config(config: PredbatTableCardConfig) {
     try {
+      // Zod strips unexpected keys silently, so manually scan and warn
+      const knownKeys = new Set(Object.keys(PredbatTableCardConfigSchema.shape));
+      const receivedKeys = Object.keys(config);
+
+      for (const key of receivedKeys) {
+        if (!knownKeys.has(key)) {
+          logger.warn(`Unexpected config key "${key}" — ignoring. Valid keys: ${[...knownKeys].join(', ')}`);
+        }
+      }
+
+      // Validate with schema
       const validatedConfig = PredbatTableCardConfigSchema.parse(config);
 
+      // Set config
       this._config = validatedConfig;
     }
     catch (error) {
-      logger.error(error);
+      logger.error('Config validation failed', error);
+
+      if (error instanceof z.ZodError) {
+        for (const issue of error.issues) {
+          logger.error(`  ${issue.path.join('.') || '(root)'}: ${issue.message}`, { code: issue.code });
+        }
+      }
     }
   }
 

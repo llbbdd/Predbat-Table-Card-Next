@@ -117,7 +117,7 @@ export class PredbatRestApiService {
     return fetch(`http://${window.location.hostname}:${port}/api/plan_data`)
       .then(async (response) => {
         if (!response.ok) {
-          logger.info('Using HASS state for Predbat data (response error)');
+          logger.info('Using HASS state for Predbat plan data');
 
           return false;
         }
@@ -129,7 +129,7 @@ export class PredbatRestApiService {
         return true;
       })
       .catch(() => {
-        logger.info('Using HASS state for Predbat data (fetch error)');
+        logger.info('Using HASS state for Predbat data');
 
         return false;
       });

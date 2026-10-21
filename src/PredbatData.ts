@@ -78,7 +78,7 @@ export class PredbatData {
         keyToUse = roundedTemporal.toString();
 
         if (newPlan.has(keyToUse)) {
-          logger.warn(`Skipping off-half-hour entry ${timeString} (collides with ${keyToUse})`);
+          // Skip off-half-hour entry (the first row is always a partial entry from now til the next half-hour)');
 
           continue;
         }

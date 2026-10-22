@@ -606,9 +606,8 @@ export class TableRenderer {
         if (Number.isNaN(newValue)) return;
 
         const formattedValue = newValue.toFixed(1);
-        const promises = [];
 
-        promises.push(this._callInputNumberSetService(entityName, formattedValue));
+        await this._callInputNumberSetService('input_number.predbat_manual_soc_value', formattedValue);
 
         const existingEntries = this._getState(entityName).state
           .replace(/^\+/, '')
@@ -620,9 +619,7 @@ export class TableRenderer {
           .filter((entry: string) => !entry.startsWith(`${timeForSelectOverride}=`));
         updatedEntries.push(`${timeForSelectOverride}=${formattedValue}`);
 
-        promises.push(this._callSelectOptionService(entityName, updatedEntries.join(',')));
-
-        await Promise.all(promises);
+        await this._callSelectOptionService(entityName, updatedEntries.join(','));
 
         closeModal();
 

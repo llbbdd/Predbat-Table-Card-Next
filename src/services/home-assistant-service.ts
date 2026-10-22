@@ -84,21 +84,22 @@ export class HomeAssistantService {
     return new PredbatData(validatedHistoricPlanData, validatedPlanData);
   }
 
-  private async _callService(domain: string, service: string, entity_id: string, option: string): Promise<void> {
+  public callSelectOptionService = async (entity_id: string, option: string): Promise<void> => {
     if (this._hass === null) throw new Error('this._hass is null');
 
-    return this._hass.callService(domain, service, {
+    return this._hass.callService('select', 'select_option', {
       entity_id: entity_id,
       option: option
     });
-  }
-
-  public callSelectOptionService = async (entity_id: string, option: string): Promise<void> => {
-    return this._callService('select', 'select_option', entity_id, option);
   };
 
-  public callInputNumberSetService = async (entity_id: string, option: string): Promise<void> => {
-    return this._callService('input_number', 'set_value', entity_id, option);
+  public callInputNumberSetService = async (entity_id: string, value: string): Promise<void> => {
+    if (this._hass === null) throw new Error('this._hass is null');
+
+    return this._hass.callService('input_number', 'set_value', {
+      entity_id: entity_id,
+      value: value
+    });
   };
 
   private _getVersions(entityId: 'update.predbat_version' | 'update.predbat_table_card_update'): SoftwareVersion {

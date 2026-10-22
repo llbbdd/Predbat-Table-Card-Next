@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const WeatherConditionSchema = z.enum([
+const WeatherConditionSchema = z.enum([
   'cloudy',
   'partlycloudy',
   'clear-night',
@@ -18,7 +18,7 @@ export const WeatherConditionSchema = z.enum([
   'windy-variant'
 ]);
 
-export const WeatherForecastItemSchema = z.object({
+const WeatherForecastItemSchema = z.object({
   condition: WeatherConditionSchema,
   datetime: z.string().transform((str) => {
     const date = new Date(str);
@@ -36,11 +36,9 @@ export const WeatherForecastItemSchema = z.object({
 
 export const WeatherForecastArraySchema = z.array(WeatherForecastItemSchema);
 
-export type WeatherForecastItem = z.infer<typeof WeatherForecastItemSchema>;
 export type WeatherForecastArray = z.infer<typeof WeatherForecastArraySchema>;
 
 export const WeatherAttributesSchema = z.object({
   friendly_name: z.string(),
   temperature_unit: z.enum(['°C', '°F'])
 });
-export type WeatherAttributes = z.infer<typeof WeatherAttributesSchema>;

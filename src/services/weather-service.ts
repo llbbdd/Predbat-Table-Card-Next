@@ -1,9 +1,9 @@
 import { Connection } from 'home-assistant-js-websocket';
-import { Sun, TemperatureUnit, WeekdayKey } from '../types/home-assistant';
+import { Sun, TemperatureUnit } from '../types/home-assistant';
 import { ForecastSubscriptionError } from '../utils/ForecastSubscriptionError';
-import { maxWeatherSubscriptionRetries, weekdayMap, white } from '../constants';
-import { getColourFromScale, invalidDay } from '../utils/general-utils';
-import { WeatherAttributesSchema, WeatherForecastArray, WeatherForecastArraySchema, WeatherForecastItem } from '../schemas/weather';
+import { maxWeatherSubscriptionRetries, white } from '../constants';
+import { getColourFromScale } from '../utils/general-utils';
+import { WeatherAttributesSchema, WeatherForecastArray, WeatherForecastArraySchema } from '../schemas/weather';
 import { logger } from '../utils/logger';
 
 export type WeatherRowData = {
@@ -162,41 +162,6 @@ export class WeatherService {
 
   public set connection(connection: Connection) {
     this._connection = connection;
-  }
-
-  // Note: the forecast data only starts at the current half hour, not the start of the day
-  public _findForecastForLabel(label: string, forecastArray: WeatherForecastArray): WeatherForecastItem | null {
-    if (!label || !forecastArray.length) {
-      return null;
-    }
-
-    const [labelDayStr, labelTimeStr] = label.split(' ');
-
-    const [labelHour] = labelTimeStr.split(':').map(Number);
-
-    if (invalidDay(labelDayStr)) throw new Error('Invalid weekday');
-
-    const targetWeekday = weekdayMap[labelDayStr as WeekdayKey];
-    const now = new Date();
-    const todayWeekday = now.getDay();
-    const dayOffset = (targetWeekday - todayWeekday + 7) % 7;
-
-    // Create label Date (local time), but round down to the hour
-    const labelDate = new Date(now);
-    labelDate.setDate(now.getDate() + dayOffset);
-    labelDate.setHours(labelHour, 0, 0, 0); // zero minutes/seconds
-
-    const labelHourTime = labelDate.getTime();
-
-    // Try to find forecast that exactly matches this hour (local time)
-    for (const forecast of forecastArray) {
-      const forecastDate = new Date(forecast.datetime); // UTC -> local
-      if (forecastDate.getTime() === labelHourTime) {
-        return forecast;
-      }
-    }
-
-    return null;
   }
 
   public isLabelDuringNight(label: string): boolean {

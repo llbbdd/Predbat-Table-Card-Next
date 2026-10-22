@@ -13,7 +13,7 @@ const versionString = `${version}`;
 
 const config = {
   entry: "./src/predbat-card.ts",
-  mode: 'development',
+  mode: isDev ? 'development' : 'production',
   devtool: isDev ? 'inline-source-map' : false,
   module: {
     rules: [

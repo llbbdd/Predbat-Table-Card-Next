@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { _formatLocalTime, cleanAndValidateVersion, convertTimeStampToFriendly, dateStringHasTimezoneOffset, getColourFromScale, getStringToDate, invalidDay, isError, isVersionGreater } from '../../../src/utils/general-utils';
+import { _formatLocalTime, cleanAndValidateVersion, convertTimeStampToFriendly, dateStringHasTimezoneOffset, getColourFromScale, invalidDay, isError, isVersionGreater } from '../../../src/utils/general-utils';
 import { RawData } from '../../../src/schemas/predbat';
 
 describe('general-utils', () => {
@@ -453,56 +453,6 @@ describe('general-utils', () => {
     describe('Edge cases', () => {
       it('should throw error when a is null', () => {
         expect(() => isVersionGreater(null, '1.0.0')).toThrow('Version string is null');
-      });
-    });
-  });
-
-  describe('getStringToDate - Parameterized', () => {
-    const fixedDate = new Date('2024-01-15T00:00:00'); // Monday
-
-    beforeEach(() => {
-      jest.useFakeTimers();
-      jest.setSystemTime(fixedDate);
-    });
-
-    afterEach(() => {
-      jest.useRealTimers();
-    });
-
-    describe('With mocked date', () => {
-      const mockDate = new Date('2024-01-15T00:00:00'); // Monday
-
-      beforeEach(() => {
-        jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
-      });
-
-      it.each([
-        ['Mon 09:00', '2024-01-15T09:00:00'],
-        ['Tue 09:00', '2024-01-16T09:00:00'],
-        ['Wed 09:00', '2024-01-17T09:00:00'],
-        ['Thu 09:00', '2024-01-18T09:00:00'],
-        ['Fri 09:00', '2024-01-19T09:00:00'],
-        ['Sat 09:00', '2024-01-20T09:00:00'],
-        ['Sun 09:00', '2024-01-21T09:00:00'],
-        ['Mon 23:30', '2024-01-15T23:30:00'],
-        ['Mon 00:00', '2024-01-15T00:00:00']
-      ])('should convert "%s" to %s', (input, expected) => {
-        const result = getStringToDate(input);
-        const expectedDate = new Date(expected);
-        expect(result.getTime()).toBe(expectedDate.getTime());
-      });
-    });
-
-    describe('Invalid inputs', () => {
-      it.each([
-        ['Invalid 09:00'],
-        [''],
-        ['Mon'],
-        ['Mon 25:00'],
-        ['Mon 09:60'],
-        ['Mon abc:def']
-      ])('should throw error for "%s"', (input) => {
-        expect(() => getStringToDate(input)).toThrow();
       });
     });
   });

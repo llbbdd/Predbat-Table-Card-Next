@@ -1,6 +1,5 @@
 import isSemver from 'is-semver';
-import { weekdayArray, weekdayMap } from '../constants';
-import type { CellValue, WeekdayKey } from '../types/home-assistant';
+import { weekdayArray } from '../constants';
 import { logger } from './logger';
 
 export function invalidDay(labelDayStr: string): boolean {
@@ -42,7 +41,7 @@ export function convertTimeStampToFriendly(dateString: string): string {
   return formatter.format(date).replace(',', '');
 }
 
-export function fixTimezoneOffset(dateString: string): string {
+function fixTimezoneOffset(dateString: string): string {
   return dateString.replace(/([+-]\d{2})(\d{2})$/, '$1:$2');
 }
 
@@ -126,45 +125,6 @@ export function getColourFromScale(scaleMinimum: number, scaleMaximum: number, v
   return reverse ? 'rgb(255, 251, 0)' : 'rgb(34, 109, 201)';
 }
 
-export function getStringToDate(input: string): Date {
-  const [day, time] = input.split(' '); // Split into "Tue" and "09:00"
-
-  if (invalidDay(day)) throw new Error('day is not valid');
-
-  const [hours, minutes] = time.split(':').map(Number); // Split and convert time to numbers
-
-  // Validate time values
-  if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-    throw new Error(`Invalid time format: ${time}`);
-  }
-
-  const targetDay = weekdayMap[day as WeekdayKey];
-
-  // Get today's date
-  const now = new Date();
-  const currentDay = now.getDay();
-
-  // Calculate the difference between today and the target day
-  const dayDifference = (targetDay - currentDay + 7) % 7; // Ensures it's positive
-  const targetDate = new Date(now);
-
-  // Set the target date to the upcoming target day
-  targetDate.setDate(now.getDate() + dayDifference);
-
-  // Set the time
-  targetDate.setHours(hours, minutes, 0, 0);
-
-  return targetDate;
-}
-
-export function getDayFromTimeColumnValue(timeColumnCell: CellValue): string {
-  const day = timeColumnCell.value.split(' ')[0];
-
-  if (!weekdayArray.includes(day)) throw new Error(`TimeColumnValue not understood: ${timeColumnCell.value}`);
-
-  return day;
-}
-
 export function _formatLocalTime(date: Date): string {
   const pad = (n: number): string => String(n).padStart(2, '0');
   const offset = -date.getTimezoneOffset();
@@ -210,28 +170,4 @@ export function formatFriendlyDate(dateString: string): string {
   });
 
   return `${datePart} ${timePart}`;
-}
-
-// This is a temporary check to highlight a missing row of data sent from Predbat
-// XX:00 to XX:29 will include full history
-// e.g last row of history is (correctly) 1530 at 1605, but is (incorrectly) still 1530 at 1635 - 1600 is missing
-export function isWithinLastHalfHour(dateString: string): void {
-  const now = Temporal.Now.plainDateTimeISO();
-  const minutes = now.minute;
-  const roundedMinutes = minutes < 30 ? 0 : 30;
-
-  const roundedNow = now.with({
-    minute: roundedMinutes,
-    second: 0,
-    millisecond: 0,
-    microsecond: 0,
-    nanosecond: 0
-  });
-
-  const thirtyMinutesAgo = roundedNow.subtract({ minutes: 30 });
-  const dateToCheck = Temporal.PlainDateTime.from(dateString);
-
-  if (Temporal.PlainDateTime.compare(dateToCheck, thirtyMinutesAgo) < 0) {
-    logger.error(`Predbat has not returned full history data. Expected data from ${thirtyMinutesAgo.toString()}, but latest received is ${dateToCheck.toString()}`);
-  }
 }

@@ -3,7 +3,6 @@ import { ColumnKey } from './schemas/home-assistant';
 export const restApiPort = 5052;
 
 export const htmlPlanEntity = 'predbat.plan_html';
-export const weekdayMap = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 } as const;
 export const weekdayArray = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const cardHeight = 3;
 export const columnsWithTotals: ColumnKey[] = [
@@ -17,8 +16,6 @@ export const columnsWithTotals: ColumnKey[] = [
   'co2kg-column',
   'xload-column'
 ];
-export const dayStart = { hour: 0, minute: 0, second: 0, millisecond: 0, microsecond: 0, nanosecond: 0 };
-export const dayEnd = { hour: 23, minute: 59, second: 59, millisecond: 999, microsecond: 999, nanosecond: 999 };
 export const maxWeatherSubscriptionRetries = 10;
 export const colourRangeForPrices = { upper: 30, lower: 0 };
 export const white = 'rgb(255, 255, 255)';

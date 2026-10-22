@@ -1,14 +1,7 @@
-export declare const process: {
-  env: {
-    PREDBAT_VERSION?: string;
-    NODE_ENV?: string;
-  };
-};
-
 import { PredbatData } from '../PredbatData';
-import { HassEntity, HistoryStateArraySchema } from '../schemas/home-assistant';
+import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRawDataSchema } from '../schemas/predbat';
-import type { EntityObject, HistoryState, HomeAssistant, SoftwareVersion, Sun } from '../types/home-assistant';
+import type { EntityObject, HomeAssistant, SoftwareVersion, Sun } from '../types/home-assistant';
 import { cleanAndValidateVersion } from '../utils/general-utils';
 
 export class HomeAssistantService {
@@ -38,22 +31,6 @@ export class HomeAssistantService {
         next_setting: sunObject.attributes.next_setting
       }
     };
-  }
-
-  public async fetchEntityHistory(entityId: string, hours = 1): Promise<HistoryState[]> {
-    if (this._hass === null) throw new Error('this._hass is null');
-
-    const end = new Date();
-    const start = new Date(end.getTime() - hours * 3600 * 1000);
-    const path = `history/period/${start.toISOString()}?end_time=${end.toISOString()}&filter_entity_id=${entityId}&minimal_response=1&significant_changes_only=1&no_attributes`;
-    const data: unknown = await this._hass.callApi('GET', path);
-
-    try {
-      return HistoryStateArraySchema.parse(data);
-    }
-    catch {
-      return [];
-    }
   }
 
   public getState(entityId: string): HassEntity {
@@ -144,3 +121,5 @@ export class HomeAssistantService {
     ];
   }
 }
+
+// TODO - relies on predbat (docker or ????) and octopus energy integration

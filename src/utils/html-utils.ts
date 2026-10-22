@@ -99,7 +99,7 @@ export function toggleCarCharging(context: HTMLElement, charging: 'on' | 'off' |
   }
 }
 
-export function getVersionElement(version: SoftwareVersion, label: string, alignment: 'left' | 'right'): HTMLSpanElement {
+function getVersionElement(version: SoftwareVersion, label: string, alignment: 'left' | 'right'): HTMLSpanElement {
   const updateAvailable = version.installed !== null && isVersionGreater(version.latest, version.installed) ? ' (Update available)' : '';
   const versionElement = spanElement('versionSpan', undefined, `${label} v${version.installed}${updateAvailable}`);
   versionElement.style.textAlign = alignment;
@@ -165,11 +165,11 @@ export function rainChanceElement(value: number, colour: string): HTMLSpanElemen
   return spanElement('iconContainer', colour, `${Math.round(value)}%`);
 }
 
-export function loadingIconElement(): HaIcon {
+function loadingIconElement(): HaIcon {
   return iconElement('reload', 16, 'reload-icon');
 }
 
-export function carChargingElement(): HaIcon {
+function carChargingElement(): HaIcon {
   return iconElement('car', 16, 'car-charging-disabled');
 }
 
@@ -185,25 +185,7 @@ export function temperatureElement(temperature: number, colour: string, temperat
   return tempSpan;
 }
 
-export function batteryIconElement(percent: number): HaIcon {
-  let iconString;
-
-  const roundedPercent = Math.round(percent / 10) * 10;
-
-  if (roundedPercent === 100) {
-    iconString = 'battery';
-  }
-  else if (roundedPercent < 5) {
-    iconString = 'battery-outline';
-  }
-  else {
-    iconString = `battery-${roundedPercent}`;
-  }
-
-  return iconElement(iconString);
-}
-
-export function arrowIconElement(change: 'rising' | 'same' | 'falling'): HaIcon {
+function arrowIconElement(change: 'rising' | 'same' | 'falling'): HaIcon {
   let iconString;
 
   if (change === 'rising') {
@@ -341,7 +323,7 @@ export function buttonElement(id: string, classname: string, text: string, click
 
 type MessageType = 'error' | 'info';
 
-export function messageCard(message: string, config: ConfigManager['config'], type: MessageType = 'error'): HTMLDivElement {
+function messageCard(message: string, config: ConfigManager['config'], type: MessageType = 'error'): HTMLDivElement {
   const container = document.createElement('div');
   container.className = type === 'error' ? 'error-card' : 'info-card';
   container.textContent = message;

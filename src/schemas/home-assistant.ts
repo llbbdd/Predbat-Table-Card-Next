@@ -2,20 +2,7 @@ import { z } from 'zod';
 import { allColumns, htmlPlanEntity } from '../constants';
 import { logger } from '../utils/logger';
 
-const HistoryStateSchema = z.object({
-  state: z.string(),
-  last_changed: z.string()
-});
-export const HistoryStateArraySchema = z.array(HistoryStateSchema);
-
-export const ValidEntityIdSchema = z.union([
-  z.literal('update.predbat_table_card_update'),
-  z.literal(htmlPlanEntity)
-]);
-export type ValidEntityId = z.infer<typeof ValidEntityIdSchema>;
-
-export const ColumnKeySchema = z.enum(allColumns);
-export type ColumnKey = z.infer<typeof ColumnKeySchema>;
+export type ColumnKey = typeof allColumns[number];
 
 const validColumns = new Set<string>(allColumns);
 
@@ -54,25 +41,23 @@ export const PredbatTableCardConfigSchema = z.object({
   ).optional().default(0),
   show_totals: z.boolean().optional().default(false)
 });
-export type PredbatTableCardConfig = z.infer<typeof PredbatTableCardConfigSchema>;
 
-export const HassEntitySchema = z.object({
-  entity_id: z.string(),
-  state: z.string(),
-  attributes: z.object({
-    options: z.array(z.string()),
-    installed_version: z.string(),
-    latest_version: z.string(),
-    html: z.string(),
-    temperature: z.number(),
-    temperature_unit: z.string(),
-    precipitation: z.number(),
-    next_rising: z.string(),
-    next_setting: z.string(),
-    unit_of_measurement: z.string(),
-    friendly_name: z.string()
-  }).catchall(z.unknown()),
-  last_changed: z.string(),
-  last_updated: z.string()
-});
-export type HassEntity = z.infer<typeof HassEntitySchema>;
+export type HassEntity = {
+  entity_id: string;
+  state: string;
+  attributes: {
+    options: string[];
+    installed_version: string;
+    latest_version: string;
+    html: string;
+    temperature: number;
+    temperature_unit: string;
+    precipitation: number;
+    next_rising: string;
+    next_setting: string;
+    unit_of_measurement: string;
+    friendly_name: string;
+  } & Record<string, unknown>;
+  last_changed: string;
+  last_updated: string;
+};

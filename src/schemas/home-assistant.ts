@@ -30,6 +30,7 @@ export const PredbatTableCardConfigSchema = z.object({
 
   // Optional
   weather_entity: z.string().optional(),
+  iboost_history_entity: z.string().optional(),
   car_charge_switch: z.enum(['on', 'off']).optional(),
   day_limit: z.number().refine(
     (val) => val > 0 && val < 14,

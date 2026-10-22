@@ -1,9 +1,11 @@
+import z from 'zod';
 import { PredbatData } from '../PredbatData';
 import { RawData, PredbatRawDataSchema } from '../schemas/predbat';
 import { logger } from '../utils/logger';
 
 export class PredbatRestApiService {
   private _dataCallback: ((predbatData: PredbatData) => void) | null;
+  private _iboostHistoryProvider: () => Promise<Map<string, number> | null>;
   private _port: number;
   private _updateInterval: ReturnType<typeof setInterval> | null = null;
   private _retryTimeout: ReturnType<typeof setInterval> | null = null;
@@ -11,18 +13,19 @@ export class PredbatRestApiService {
   private _isAvailable = false;
   private _fetchInProgress = false;
 
-  public constructor(port: number, dataCallback: (predbatData: PredbatData) => void) {
+  public constructor(port: number, dataCallback: (predbatData: PredbatData) => void, iboostHistoryProvider: () => Promise<Map<string, number> | null>) {
     this._port = port;
     this._dataCallback = dataCallback;
+    this._iboostHistoryProvider = iboostHistoryProvider;
     this._startPolling();
   }
 
   private _startPolling(): void {
-    this._fetchData();
+    void this._fetchData();
 
     this._retryTimeout = setInterval(() => {
       if (!this._isAvailable && !this._fetchInProgress) {
-        this._fetchData();
+        void this._fetchData();
       }
       else if (this._isAvailable) {
         if (this._retryTimeout) {
@@ -33,51 +36,56 @@ export class PredbatRestApiService {
     }, 1000);
   }
 
-  private _fetchData(): void {
+  private async _fetchData(): Promise<void> {
     if (this._fetchInProgress) return;
     this._fetchInProgress = true;
 
-    this._getPlanData(this._port)
-      .then((planData) => {
-        if (planData?.yesterday === undefined) {
-          logger.warn('No data received from Predbat API');
+    try {
+      const planData = await this._getPlanData(this._port);
 
-          return;
+      if (planData?.yesterday === undefined) {
+        logger.warn('No data received from Predbat API');
+
+        return;
+      }
+
+      const validatedHistoricPlanData: RawData = PredbatRawDataSchema.parse(planData.yesterday);
+      const validatedPlanData: RawData = PredbatRawDataSchema.parse(planData.plan);
+
+      let iboostHistory: Map<string, number> | null = null;
+
+      try {
+        iboostHistory = await this._iboostHistoryProvider();
+      }
+      catch (error) {
+        logger.warn('Failed to fetch iBoost history', error);
+      }
+
+      if (this._dataCallback === null) throw new Error('this._dataCallback is null');
+
+      this._dataCallback(new PredbatData(validatedHistoricPlanData, validatedPlanData, iboostHistory));
+
+      if (!this._isAvailable) {
+        logger.info('Successfully fetched Predbat API data');
+
+        this._isAvailable = true;
+        this._scheduleHalfHourUpdate(5);
+      }
+    }
+    catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      logger.error(`PredbatRestApiService._fetchData failed to parse plan data: ${message}`, error);
+
+      if (error instanceof z.ZodError) {
+        for (const issue of error.issues) {
+          logger.error(`  ${issue.path.join('.') || '(root)'}: ${issue.message}`);
         }
-
-        try {
-          const validatedHistoricPlanData: RawData = PredbatRawDataSchema.parse(planData.yesterday);
-          const validatedPlanData: RawData = PredbatRawDataSchema.parse(planData.plan);
-
-          if (this._dataCallback === null) throw new Error('this._dataCallback is null');
-
-          this._dataCallback(new PredbatData(validatedHistoricPlanData, validatedPlanData));
-        }
-        catch (error) {
-          logger.error(error);
-        }
-
-        if (!this._isAvailable) {
-          logger.info('Successfully fetched Predbat API data');
-
-          this._isAvailable = true;
-          this._scheduleHalfHourUpdate(5);
-        }
-      })
-      .catch((error) => {
-        if (this._isAvailable) {
-          logger.warn('Predbat API request failed, will retry...', error.message);
-
-          this._isAvailable = false;
-          this._startPolling();
-        }
-        else {
-          logger.error('Predbat is unreachable');
-        }
-      })
-      .finally(() => {
-        this._fetchInProgress = false;
-      });
+      }
+    }
+    finally {
+      this._fetchInProgress = false;
+    }
   }
 
   private _scheduleHalfHourUpdate(updateIntervalMinutes: number): void {
@@ -96,9 +104,9 @@ export class PredbatRestApiService {
 
     this._initialUpdateTimeout = setTimeout(() => {
       this._initialUpdateTimeout = null;
-      this._fetchData();
+      void this._fetchData();
       this._updateInterval = setInterval(() => {
-        this._fetchData();
+        void this._fetchData();
       }, updateIntervalMinutes * 60 * 1000);
     }, delay);
   }

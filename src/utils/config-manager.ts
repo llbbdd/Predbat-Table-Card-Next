@@ -63,6 +63,12 @@ export class ConfigManager {
     return this._config.weather_entity;
   }
 
+  public get iboostHistoryEntity(): string | undefined {
+    if (this._config === null) throw new Error('Config data not received');
+
+    return this._config.iboost_history_entity;
+  }
+
   public get dayLimit(): number {
     if (this._config === null) throw new Error('Config data not received');
 

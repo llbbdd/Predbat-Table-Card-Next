@@ -75,7 +75,9 @@ export const configForm = {
       name: 'entity',
       selector: { entity: {} },
       default: 'predbat.plan_html'
-    }
+    },
+    { name: 'iboost_history_entity', selector: { entity: {} } }
+
   ],
   computeLabel: (schema: Schema): string | undefined => {
     switch (schema.name) {
@@ -89,6 +91,8 @@ export const configForm = {
         return 'Weather Entity';
       case 'entity':
         return 'Predbat Plan Entity';
+      case 'iboost_history_entity':
+        return 'iBoost History Entity';
     }
 
     return undefined;
@@ -105,6 +109,8 @@ export const configForm = {
         return 'Optional - Home Assistant entity to use for weather forecast';
       case 'entity':
         return 'Optional - Entity providing the Predbat plan (default: predbat.plan_html)';
+      case 'iboost_history_entity':
+        return 'Optional - Home Assistant entity whose recorder history supplies historic iBoost values';
     }
 
     return undefined;

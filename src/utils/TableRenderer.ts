@@ -760,3 +760,5 @@ export class TableRenderer {
     });
   }
 }
+
+// at 2155, the next day's programme only goes as far as 2130, not 2230 like the prices stretch to

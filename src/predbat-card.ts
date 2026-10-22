@@ -10,6 +10,8 @@ import { modalStyles } from './styles/modal-styles';
 import { divElement, getVersionRowElement, haCardElement, styleElement, toggleCarCharging, toggleGeneratingPlan } from './utils/html-utils';
 import { PredbatRestApiService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
+import { logger } from './utils/logger';
+import z from 'zod';
 
 type PlanStatus = 'waiting' | 'failed' | 'available';
 
@@ -23,6 +25,7 @@ class PredbatTableCard extends HTMLElement {
   private _planStatus: PlanStatus = 'waiting';
   private _restApiAvailable = false;
   private _lastPlanUpdated: string | null = null;
+  private _initialisingRestApi = false;
 
   // reactive data
   private _reactiveDataState: { overrides: string | null, generatingPlan: boolean, carCharging: 'on' | 'off' | undefined } = {
@@ -37,9 +40,9 @@ class PredbatTableCard extends HTMLElement {
     this._haService.dayLimit = this._configManager.dayLimit;
 
     if (!this._weatherService.subscribed) {
-      this._weatherService.subscribe(this._configManager.weatherEntity)
+      void this._weatherService.subscribe(this._configManager.weatherEntity)
         .catch((error) => {
-          this._tableRenderer.renderError(error);
+          logger.warn('Weather subscription failed — continuing without weather', error);
         });
     }
 
@@ -84,29 +87,29 @@ class PredbatTableCard extends HTMLElement {
       const planEntityState = hass.states[this._configManager.planEntity];
 
       if (planEntityState === undefined) {
-        // Config entity ID is valid, but HA has no state for it — Predbat hasn't produced a plan
         if (this._planStatus !== 'failed') {
           this._planStatus = 'failed';
           this._render();
         }
       }
-      else {
-        try {
-          const predbatData = this._haService.getPredbatData(planEntityState.entity_id);
+      else if (planEntityState.last_updated !== this._lastPlanUpdated) {
+        void this._handleHassPlanUpdate(planEntityState.last_updated)
+          .catch((error: unknown) => {
+            const message = error instanceof Error ? error.message : String(error);
 
-          if (predbatData !== null) {
-            this._planStatus = 'available';
-            this.setPlanData(predbatData);
-            this._lastPlanUpdated = planEntityState.last_updated;
-            this._render();
-          }
-        }
-        catch {
-          if (this._planStatus !== 'failed') {
-            this._planStatus = 'failed';
-            this._render();
-          }
-        }
+            logger.error(`_handleHassPlanUpdate failed: ${message}`, error);
+
+            if (error instanceof z.ZodError) {
+              for (const issue of error.issues) {
+                logger.error(`  ${issue.path.join('.') || '(root)'}: ${issue.message}`);
+              }
+            }
+
+            if (this._planStatus !== 'failed') {
+              this._planStatus = 'failed';
+              this._render();
+            }
+          });
       }
     }
   }
@@ -216,26 +219,79 @@ class PredbatTableCard extends HTMLElement {
   };
 
   private _initialiseRestApi(): void {
+    if (this._initialisingRestApi) return;
+
     if (this._predbatRestApiService) {
       this._predbatRestApiService.disconnect();
       this._predbatRestApiService = null;
     }
 
     this._restApiAvailable = false;
+    this._initialisingRestApi = true;
 
     PredbatRestApiService.restApiAvailable(restApiPort)
       .then((restApiAvailable) => {
         this._restApiAvailable = restApiAvailable;
 
-        if (restApiAvailable) this._predbatRestApiService = new PredbatRestApiService(restApiPort, this.setPlanData);
+        if (restApiAvailable) {
+          this._predbatRestApiService = new PredbatRestApiService(
+            restApiPort,
+            this.setPlanData,
+            () => this._fetchIboostHistory()
+          );
+        }
 
         this._render();
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        logger.warn(`_initialiseRestApi failed: ${message}`, error);
+
         this._restApiAvailable = false;
 
         this._render();
+      })
+      .finally(() => {
+        this._initialisingRestApi = false;
       });
+  }
+
+  private async _fetchIboostHistory(): Promise<Map<string, number> | null> {
+    const entityId = this._configManager.iboostHistoryEntity;
+
+    if (entityId === undefined) return null;
+
+    try {
+      const history = await this._haService.fetchIboostHistory(entityId);
+
+      return history.size > 0 ? history : null;
+    }
+    catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+
+      logger.warn(`_fetchIboostHistory failed: ${message}`, error);
+
+      return null;
+    }
+  }
+
+  private async _handleHassPlanUpdate(lastUpdated: string): Promise<void> {
+    const planEntityId = this._configManager.planEntity;
+    const planEntityState = this._haService.getState(planEntityId);
+
+    if (planEntityState.state === 'unavailable') return;
+
+    const iboostHistory = await this._fetchIboostHistory();
+    const predbatData = this._haService.getPredbatData(planEntityId, iboostHistory);
+
+    if (predbatData !== null) {
+      this._planStatus = 'available';
+      this.setPlanData(predbatData);
+      this._lastPlanUpdated = lastUpdated;
+
+      this._render();
+    }
   }
 
   private _render(): void {

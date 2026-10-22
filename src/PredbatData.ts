@@ -25,11 +25,16 @@ export class PredbatData {
     'xload-column': false
   };
 
-  public constructor(validatedHistoricPlanData: RawData, validatedPlanData: RawData) {
+  public constructor(validatedHistoricPlanData: RawData | null, validatedPlanData: RawData, iboostHistory: Map<string, number> | null = null) {
     this._plan = new Map<string, PredbatRowData>();
 
-    this._formatAndAddData(this._plan, validatedHistoricPlanData);
-    this._formatAndAddData(this._plan, validatedPlanData);
+    if (validatedHistoricPlanData !== null) {
+      this._formatAndAddData(this._plan, validatedHistoricPlanData, iboostHistory);
+    }
+
+    this._formatAndAddData(this._plan, validatedPlanData, iboostHistory);
+
+    if (iboostHistory !== null && iboostHistory.size > 0) this._hasData['iboost-column'] = true;
 
     this._verifyPlan();
     this._calculateTotals();
@@ -115,7 +120,13 @@ export class PredbatData {
     this._plan = newPlan;
   }
 
-  private _formatAndAddData(tempMap: Map<string, PredbatRowData | null>, rawData: RawData): Map<string, PredbatRowData | null> {
+  private _formatAndAddData(
+    tempMap: Map<string, PredbatRowData | null>,
+    rawData: RawData,
+    iboostHistory: Map<string, number> | null
+  ): Map<string, PredbatRowData | null> {
+    const now = Temporal.Now.plainDateTimeISO();
+
     rawData.rows.forEach((row) => {
       if (row.load_forecast !== 0) this._hasData['load-column'] = true;
       if (row.import_rate !== 0) this._hasData['import-column'] = true;
@@ -127,12 +138,25 @@ export class PredbatData {
       if (row.cost_change > 0) this._hasData['cost-column'] = true;
       if (row.car_charging !== undefined) this._hasData['car-column'] = true;
       if (row.clipped > 0) this._hasData['clip-column'] = true;
-      if (row.iboost !== undefined) this._hasData['iboost-column'] = true;
+
+      const rowTime = Temporal.PlainDateTime.from(row.time);
+      const rowKey = rowTime.toString();
+      const isHistoric = Temporal.PlainDateTime.compare(rowTime, now) < 0;
+
+      let iboostValue: number | undefined = row.iboost_change;
+
+      const historyValue = iboostHistory?.get(rowKey);
+
+      if (isHistoric && historyValue !== undefined) {
+        iboostValue = historyValue;
+      }
+
+      if (iboostValue !== undefined) this._hasData['iboost-column'] = true;
       this._hasData['net-energy-column'] = true;
       if (row.carbon_intensity !== undefined) this._hasData['co2kg-column'] = true;
       if (row.extra_load > 0) this._hasData['xload-column'] = true;
 
-      tempMap.set(Temporal.PlainDateTime.from(row.time).toString(), {
+      tempMap.set(rowKey, {
         'load-column': {
           value: row.load_forecast,
           colour: row.load_color
@@ -178,11 +202,11 @@ export class PredbatData {
           colour: row.clipped_color
         },
         'iboost-column': {
-          value: row.iboost ?? 0,
-          colour: white
+          value: Math.round((iboostValue ?? 0) * 100) / 100,
+          colour: row.iboost_color ?? white
         },
         'net-energy-column': {
-          value: Math.round(((row.pv_forecast ?? 0) - row.load_forecast - (row.car_charging ?? 0) - (row.iboost ?? 0)) * 100) / 100,
+          value: Math.round(((row.pv_forecast ?? 0) - row.load_forecast - (row.car_charging ?? 0) - (iboostValue ?? 0)) * 100) / 100,
           colour: white
         },
         'co2kg-column': row.carbon_intensity === undefined ? null : {
@@ -241,14 +265,7 @@ export class PredbatData {
           const rowData = row[columnWithTotal as keyof PredbatRowData];
 
           if (rowData && typeof rowData.value === 'number') {
-            if (columnWithTotal === 'iboost-column') {
-              // iBoost is a running total per slot, so the day's total is the last value recorded, not the sum of every slot.
-              tempTotals[columnWithTotal] = rowData.value;
-            }
-            else {
-              const currentTotal = tempTotals[columnWithTotal] ?? 0;
-              tempTotals[columnWithTotal] = currentTotal + rowData.value;
-            }
+            tempTotals[columnWithTotal] = (tempTotals[columnWithTotal] ?? 0) + rowData.value;
           }
         }
       });

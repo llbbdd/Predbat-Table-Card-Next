@@ -66,6 +66,8 @@ const RawRowSchema = z.object({
   extra_load: z.coerce.number(),
   car_charging: z.number().optional(),
   iboost: z.number().optional(),
+  iboost_change: z.number().optional(),
+  iboost_color: ColorSchema.optional(),
   extra_load_total: z.number(),
   extra_color: ColorSchema, // ASK - relates to extra_load_total?
   soc_percent: z.number(),

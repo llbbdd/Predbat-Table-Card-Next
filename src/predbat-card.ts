@@ -208,7 +208,7 @@ class PredbatTableCard extends HTMLElement {
       name: 'PredBat Card',
       preview: true,
       description: 'Predbat Card showing the plan table in a nicer format',
-      documentationURL: 'https://github.com/pacemaker82/PredBat-Table-Card/blob/main/README.md'
+      documentationURL: 'https://github.com/llbbdd/Predbat-Table-Card-Next/blob/main/README.md'
     });
   }
 

@@ -11,7 +11,7 @@ My system doesn't have all the features Predbat supports, which means I can't te
 ## HACS Installation (addition to HACS is currently under review - use manual install process for now)
 
 1. Open HACS
-2. Add `https://https://github.com/llbbdd/Predbat-Table-Card-Next` as a custom repository, using the `Dashboard` category
+2. Add `https://github.com/llbbdd/Predbat-Table-Card-Next` as a custom repository, using the `Dashboard` category
 3. Search for `Predbat Table Card Next` in the HACS store
 4. Download and refresh
 5. Go to your chosen dashboard and select `edit`

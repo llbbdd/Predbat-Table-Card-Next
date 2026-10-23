@@ -708,8 +708,6 @@ export class TableRenderer {
     });
     document.addEventListener('keydown', escHandler);
 
-    void overlay.offsetWidth;
-
     return { overlay, closeModal };
   }
 

@@ -158,10 +158,16 @@ class PredbatTableCard extends HTMLElement {
     const tableOuterContainer = divElement('table-outer-container');
     cardOuterContainer.appendChild(tableOuterContainer);
 
-    const homeAssistantVersion = this._haService.getHomeAssistantVersions();
-    const cardVersion = this._haService.getCardVersions();
-    const versionRow = getVersionRowElement(homeAssistantVersion, cardVersion);
-    cardOuterContainer.appendChild(versionRow);
+    try {
+      const homeAssistantVersion = this._haService.getHomeAssistantVersions();
+      const cardVersion = this._haService.getCardVersions();
+      const versionRow = getVersionRowElement(homeAssistantVersion, cardVersion);
+      cardOuterContainer.appendChild(versionRow);
+    }
+    catch (error) {
+      logger.warn('Could not render version row — continuing without it', error);
+    }
+
     this.replaceChildren(cardOuterContainer);
 
     // Add styles

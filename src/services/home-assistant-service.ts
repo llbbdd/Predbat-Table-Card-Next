@@ -230,12 +230,12 @@ export class HomeAssistantService {
   public getCardVersions(): SoftwareVersion {
     const tempVersion = this._getVersions('update.predbat_table_card_update');
 
-    if (tempVersion.installed === null) {
-      // Version is provided by HACS, so fall back to package.json for development environment
-      if (process.env.NODE_ENV !== 'development') throw new Error('Card version not received from update.predbat_table_card_update');
-      if (process.env.PREDBAT_VERSION === undefined) throw new Error('PREDBAT_VERSION env var not set');
+    if (tempVersion.installed === null && process.env.PREDBAT_VERSION !== undefined) {
+      tempVersion.installed = cleanAndValidateVersion(process.env.PREDBAT_VERSION);
+    }
 
-      tempVersion.installed = process.env.PREDBAT_VERSION;
+    if (tempVersion.installed === null) {
+      logger.warn('Card version not available from update.predbat_table_card_update or PREDBAT_VERSION');
     }
 
     return tempVersion;

@@ -5,6 +5,7 @@ import { maxWeatherSubscriptionRetries, white } from '../constants';
 import { getColourFromScale } from '../utils/general-utils';
 import { WeatherAttributesSchema, WeatherForecastArray, WeatherForecastArraySchema } from '../schemas/weather';
 import { logger } from '../utils/logger';
+import { Temporal } from '@js-temporal/polyfill';
 
 export type WeatherRowData = {
   'weather-column': { value: string, colour: string } | null;

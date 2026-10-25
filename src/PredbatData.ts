@@ -4,6 +4,7 @@ import { PredbatRowData, RawData } from './schemas/predbat';
 import { change } from './utils/entity-utils';
 import { getColourFromScale } from './utils/general-utils';
 import { logger } from './utils/logger';
+import { Temporal } from '@js-temporal/polyfill';
 
 export class PredbatData {
   private _plan: Map<string, PredbatRowData | null> | null = null;

@@ -8,6 +8,7 @@ import { ConfigManager } from './config-manager';
 import { getArrayForEntityForceStates } from './entity-utils';
 import { convertTimeStampToFriendly, formatFriendlyDate } from './general-utils';
 import { weatherIconElement, spanElement, temperatureElement, rainChanceElement, tableCellElement, tableHeaderRowElement, tableElement, tableBodyElement, tableRowElement, editOveridesIconElement, overrideButtonsDivElement, divElement, overrideIconElement, modalCloseIcon, numberInputElement, buttonElement, errorCard, tableHeadElement, getOverrideIconStyles, infoCard, loadingCard, barElement, socBarElement } from './html-utils';
+import { Temporal } from '@js-temporal/polyfill';
 
 export class TableRenderer {
   private _configManager: ConfigManager;

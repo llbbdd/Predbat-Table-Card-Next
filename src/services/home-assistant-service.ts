@@ -4,6 +4,7 @@ import { PredbatRawDataSchema } from '../schemas/predbat';
 import type { EntityObject, HomeAssistant, SoftwareVersion, Sun } from '../types/home-assistant';
 import { cleanAndValidateVersion } from '../utils/general-utils';
 import { logger } from '../utils/logger';
+import { Temporal } from '@js-temporal/polyfill';
 
 export class HomeAssistantService {
   private _hass: HomeAssistant | null = null;

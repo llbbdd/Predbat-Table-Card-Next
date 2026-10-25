@@ -368,21 +368,3 @@ describe('general-utils', () => {
     });
   });
 });
-
-// Helper to display RGB colour in terminal
-function displayColour(rgb: string, label: string): void {
-  const match = rgb.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (match) {
-    const r = parseInt(match[1]);
-    const g = parseInt(match[2]);
-    const b = parseInt(match[3]);
-    const bgColour = `\x1b[48;2;${r};${g};${b}m`;
-    const reset = '\x1b[0m';
-    // eslint-disable-next-line no-console
-    console.info(`${bgColour}  ${label.padEnd(22)} ${rgb}  ${reset}`);
-  }
-  else {
-    // eslint-disable-next-line no-console
-    console.info(`${label.padEnd(22)} ${rgb}`);
-  }
-}

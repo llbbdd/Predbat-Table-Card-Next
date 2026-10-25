@@ -1,27 +1,5 @@
 import semver from 'semver';
-import { weekdayArray } from '../constants';
 import { logger } from './logger';
-
-export function invalidDay(labelDayStr: string): boolean {
-  if (!weekdayArray.includes(labelDayStr)) return true;
-
-  return false;
-}
-
-export function isError(error: unknown): error is Error {
-  return typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof error.message === 'string';
-}
-
-export function dateStringHasTimezoneOffset(val: string): boolean {
-  if (!/[+-]\d{2}:\d{2}$/.test(val) && !/[+-]\d{4}$/.test(val)) {
-    return false;
-  }
-
-  return true;
-}
 
 export function convertTimeStampToFriendly(dateString: string): string {
   // Fix timezone colon if missing (e.g., +0000 → +00:00)
@@ -103,15 +81,6 @@ export function getColourFromScale(scaleMinimum: number, scaleMaximum: number, v
   if (colourScheme === 'redToBlue') return reverse ? 'rgb(31, 136, 207)' : 'rgb(220, 67, 20)';
 
   return reverse ? 'rgb(255, 251, 0)' : 'rgb(34, 109, 201)';
-}
-
-export function _formatLocalTime(date: Date): string {
-  const pad = (n: number): string => String(n).padStart(2, '0');
-  const offset = -date.getTimezoneOffset();
-  const sign = offset >= 0 ? '+' : '-';
-  const offHours = String(Math.floor(Math.abs(offset) / 60)).padStart(2, '0');
-  const offMins = String(Math.abs(offset) % 60).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00${sign}${offHours}${offMins}`;
 }
 
 export function formatFriendlyDate(dateString: string): string {

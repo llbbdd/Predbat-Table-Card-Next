@@ -3,7 +3,6 @@ import { ColumnKey } from './schemas/home-assistant';
 export const restApiPort = 5052;
 
 export const htmlPlanEntity = 'predbat.plan_html';
-export const weekdayArray = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const cardHeight = 3;
 export const columnsWithTotals: ColumnKey[] = [
   'load-column',

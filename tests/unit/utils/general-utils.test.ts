@@ -1,5 +1,5 @@
 import { describe, it, expect } from '@jest/globals';
-import { _formatLocalTime, cleanAndValidateVersion, convertTimeStampToFriendly, dateStringHasTimezoneOffset, getColourFromScale, invalidDay, isError, isVersionGreater } from '../../../src/utils/general-utils';
+import { _formatLocalTime, cleanAndValidateVersion, convertTimeStampToFriendly, dateStringHasTimezoneOffset, getColourFromScale, invalidDay, isError } from '../../../src/utils/general-utils';
 import { RawData } from '../../../src/schemas/predbat';
 
 describe('general-utils', () => {
@@ -379,80 +379,6 @@ describe('general-utils', () => {
             expect(colour).toMatch(/^rgb\(\d{1,3}, \d{1,3}, \d{1,3}\)$/);
           });
         });
-      });
-    });
-  });
-
-  describe('isVersionGreater', () => {
-    describe('Valid versions', () => {
-      it('should return true when a is greater than b (major version)', () => {
-        expect(isVersionGreater('2.0.0', '1.0.0')).toBe(true);
-      });
-
-      it('should return false when a is less than b (major version)', () => {
-        expect(isVersionGreater('1.0.0', '2.0.0')).toBe(false);
-      });
-
-      it('should return true when a is greater than b (minor version)', () => {
-        expect(isVersionGreater('1.2.0', '1.1.0')).toBe(true);
-      });
-
-      it('should return false when a is less than b (minor version)', () => {
-        expect(isVersionGreater('1.1.0', '1.2.0')).toBe(false);
-      });
-
-      it('should return true when a is greater than b (patch version)', () => {
-        expect(isVersionGreater('1.0.2', '1.0.1')).toBe(true);
-      });
-
-      it('should return false when a is less than b (patch version)', () => {
-        expect(isVersionGreater('1.0.1', '1.0.2')).toBe(false);
-      });
-
-      it('should return false when versions are equal', () => {
-        expect(isVersionGreater('1.0.0', '1.0.0')).toBe(false);
-      });
-
-      it('should handle versions with leading "v"', () => {
-        expect(isVersionGreater('v2.0.0', 'v1.0.0')).toBe(true);
-        expect(isVersionGreater('v1.0.0', 'v2.0.0')).toBe(false);
-        expect(isVersionGreater('v1.2.0', 'v1.1.0')).toBe(true);
-        expect(isVersionGreater('v1.0.2', 'v1.0.1')).toBe(true);
-      });
-
-      it('should handle mixed leading "v"', () => {
-        expect(isVersionGreater('v2.0.0', '1.0.0')).toBe(true);
-        expect(isVersionGreater('1.0.0', 'v2.0.0')).toBe(false);
-      });
-    });
-
-    describe('Different version lengths', () => {
-      it('should handle a with fewer parts than b', () => {
-        expect(isVersionGreater('1.2', '1.2.0')).toBe(false);
-        expect(isVersionGreater('1.3', '1.2.9')).toBe(true);
-      });
-
-      it('should handle a with more parts than b', () => {
-        expect(isVersionGreater('1.2.0', '1.2')).toBe(false);
-        expect(isVersionGreater('1.2.1', '1.2')).toBe(true);
-      });
-
-      it('should handle single part versions', () => {
-        expect(isVersionGreater('2', '1')).toBe(true);
-        expect(isVersionGreater('1', '2')).toBe(false);
-        expect(isVersionGreater('1', '1')).toBe(false);
-      });
-
-      it('should handle single part with multi-part', () => {
-        expect(isVersionGreater('2', '1.9.9')).toBe(true);
-        expect(isVersionGreater('1', '1.9.9')).toBe(false);
-        expect(isVersionGreater('2', '2.0.0')).toBe(false);
-      });
-    });
-
-    describe('Edge cases', () => {
-      it('should throw error when a is null', () => {
-        expect(() => isVersionGreater(null, '1.0.0')).toThrow('Version string is null');
       });
     });
   });

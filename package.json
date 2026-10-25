@@ -19,6 +19,7 @@
     "@types/is-semver": "^1.0.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.1",
+    "@types/semver": "^7.8.0",
     "babel-jest": "^30.4.1",
     "eslint": "^10.7.0",
     "globals": "^17.7.0",
@@ -34,7 +35,7 @@
   },
   "dependencies": {
     "home-assistant-js-websocket": "^9.6.0",
-    "is-semver": "^1.0.12",
+    "semver": "^7.8.5",
     "zod": "^4.4.3"
   }
 }

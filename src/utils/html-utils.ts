@@ -2,7 +2,7 @@ import { columnHeaderIcon, columnHeaderText, ColumnType } from '../constants';
 import { ColumnKey } from '../schemas/home-assistant';
 import { EntityObject, HaIcon, SoftwareVersion } from '../types/home-assistant';
 import type { ConfigManager } from './config-manager';
-import { isVersionGreater } from './general-utils';
+import semver from 'semver';
 
 export function tableElement(): HTMLTableElement {
   const table = document.createElement('table');
@@ -100,7 +100,17 @@ export function toggleCarCharging(context: HTMLElement, charging: 'on' | 'off' |
 }
 
 function getVersionElement(version: SoftwareVersion, label: string, alignment: 'left' | 'right'): HTMLSpanElement {
-  const updateAvailable = version.installed !== null && isVersionGreater(version.latest, version.installed) ? ' (Update available)' : '';
+  let updateAvailable = '';
+
+  if (version.installed !== null && version.latest !== null) {
+    try {
+      updateAvailable = semver.gt(version.latest, version.installed) ? ' (Update available)' : '';
+    }
+    catch {
+      // One of the version strings is not valid semver so treat as "no update available"
+    }
+  }
+
   const versionElement = spanElement('versionSpan', undefined, `${label} v${version.installed}${updateAvailable}`);
   versionElement.style.textAlign = alignment;
 

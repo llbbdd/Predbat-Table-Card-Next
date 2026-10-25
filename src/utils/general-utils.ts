@@ -1,4 +1,4 @@
-import isSemver from 'is-semver';
+import semver from 'semver';
 import { weekdayArray } from '../constants';
 import { logger } from './logger';
 
@@ -45,39 +45,19 @@ function fixTimezoneOffset(dateString: string): string {
   return dateString.replace(/([+-]\d{2})(\d{2})$/, '$1:$2');
 }
 
-// is latestVersion > currentVersion?
-export function isVersionGreater(latestVersion: string | null, currentVersion: string): boolean {
-  if (latestVersion === null) return false;
-
-  const pa = latestVersion.replace(/^v/, '').split('.').map(Number);
-  const pb = currentVersion.replace(/^v/, '').split('.').map(Number);
-
-  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
-    const na = pa[i] ?? 0;
-    const nb = pb[i] ?? 0;
-    if (na > nb) return true;
-    if (na < nb) return false;
-  }
-  return false;
-}
-
 export function cleanAndValidateVersion(version: string | undefined): string | null {
   if (version === undefined) return null;
 
-  const trimmed = version.trim();
+  const cleaned = semver.clean(version);
 
-  if (trimmed === '') return null;
-
-  const cleaned = trimmed.startsWith('v') ? trimmed.slice(1) : trimmed;
-
-  if (!isSemver(cleaned)) {
+  if (cleaned === null) {
     logger.warn(`Invalid version format: ${version}`);
 
     return null;
   }
 
   return cleaned;
-};
+}
 
 export function getColourFromScale(scaleMinimum: number, scaleMaximum: number, valueInPence: string, colourScheme: 'redToGreen' | 'redToBlue', reverse = false): string {
   const value = parseFloat(valueInPence);

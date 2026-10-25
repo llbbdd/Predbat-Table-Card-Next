@@ -1,4 +1,4 @@
-import { cardHeight, restApiPort } from './constants';
+import { cardHeight, githubRepo, restApiPort } from './constants';
 import { configForm } from './schemas/configForm';
 import { HomeAssistantService } from './services/home-assistant-service';
 import { WeatherService } from './services/weather-service';
@@ -12,12 +12,14 @@ import { PredbatRestApiService } from './services/predbat-service';
 import { PredbatData } from './PredbatData';
 import { logger } from './utils/logger';
 import z from 'zod';
+import { GitHubService } from './services/github-service';
 
 type PlanStatus = 'waiting' | 'failed' | 'available';
 
 class PredbatTableCard extends HTMLElement {
   private _haService = new HomeAssistantService();
   private _predbatRestApiService: PredbatRestApiService | null = null;
+  private _gitHubService: GitHubService | null = null;
   private _configManager: ConfigManager = new ConfigManager();
   private _tableRenderer: TableRenderer = new TableRenderer(this._configManager);
   private _weatherService = new WeatherService();
@@ -158,6 +160,8 @@ class PredbatTableCard extends HTMLElement {
     const tableOuterContainer = divElement('table-outer-container');
     cardOuterContainer.appendChild(tableOuterContainer);
 
+    this.replaceChildren(cardOuterContainer);
+
     try {
       const homeAssistantVersion = this._haService.getHomeAssistantVersions();
       const cardVersion = this._haService.getCardVersions();
@@ -168,7 +172,29 @@ class PredbatTableCard extends HTMLElement {
       logger.warn('Could not render version row — continuing without it', error);
     }
 
-    this.replaceChildren(cardOuterContainer);
+    this._gitHubService = new GitHubService(githubRepo, (latest) => {
+      if (latest === null) return;
+
+      const cardVersion = this._haService.getCardVersions();
+
+      if (cardVersion.installed === null) return;
+
+      logger.info(`Card version: current ${cardVersion.installed}, latest release ${latest}`);
+
+      // Prefer HACS's latest version, fall back to GitHub's.
+      const effectiveLatest = cardVersion.latest ?? latest;
+
+      if (effectiveLatest === cardVersion.latest) return;
+
+      const updatedRow = getVersionRowElement(
+        this._haService.getHomeAssistantVersions(),
+        { installed: cardVersion.installed, latest: effectiveLatest }
+      );
+
+      const existingRow = this.querySelector('.version-row-container');
+
+      if (existingRow !== null) existingRow.replaceWith(updatedRow);
+    });
 
     // Add styles
     const cardStyleTag = styleElement('predbat-table-styles', tableStyles);
@@ -197,6 +223,11 @@ class PredbatTableCard extends HTMLElement {
     if (this._predbatRestApiService) {
       this._predbatRestApiService.disconnect();
       this._predbatRestApiService = null;
+    }
+
+    if (this._gitHubService !== null) {
+      this._gitHubService.disconnect();
+      this._gitHubService = null;
     }
 
     this._lastPlanUpdated = null;

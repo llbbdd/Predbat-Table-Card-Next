@@ -9,7 +9,6 @@ import { Temporal } from '@js-temporal/polyfill';
 export class HomeAssistantService {
   private _hass: HomeAssistant | null = null;
   private _dayLimit: number | null = null;
-  private _lastPlanUpdated: string | null = null;
 
   // Accept new HomeAssistant data
   public set hass(newHass: HomeAssistant) {
@@ -211,7 +210,7 @@ export class HomeAssistantService {
     return result;
   }
 
-  private _getVersions(entityId: 'update.predbat_version' | 'update.predbat_table_card_update'): SoftwareVersion {
+  private _getVersions(entityId: 'update.predbat_version' | 'update.predbat_table_card_next_update'): SoftwareVersion {
     try {
       const versionEntityAttributes = this.getState(entityId);
       const installed = cleanAndValidateVersion(versionEntityAttributes.attributes.installed_version);
@@ -229,14 +228,14 @@ export class HomeAssistantService {
   }
 
   public getCardVersions(): SoftwareVersion {
-    const tempVersion = this._getVersions('update.predbat_table_card_update');
+    const tempVersion = this._getVersions('update.predbat_table_card_next_update');
 
     if (tempVersion.installed === null && process.env.PREDBAT_VERSION !== undefined) {
       tempVersion.installed = cleanAndValidateVersion(process.env.PREDBAT_VERSION);
     }
 
     if (tempVersion.installed === null) {
-      logger.warn('Card version not available from update.predbat_table_card_update or PREDBAT_VERSION');
+      logger.warn('Card version not available from update.predbat_table_card_next_update or PREDBAT_VERSION');
     }
 
     return tempVersion;

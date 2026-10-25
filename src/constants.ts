@@ -2,6 +2,8 @@ import { ColumnKey } from './schemas/home-assistant';
 
 export const restApiPort = 5052;
 
+export const githubRepo = 'llbbdd/Predbat-Table-Card-Next';
+
 export const htmlPlanEntity = 'predbat.plan_html';
 export const cardHeight = 3;
 export const columnsWithTotals: ColumnKey[] = [

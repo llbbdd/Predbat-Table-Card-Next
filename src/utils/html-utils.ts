@@ -1,5 +1,6 @@
-import { columnHeaderIcon, columnHeaderText, ColumnType } from '../constants';
+import { columnHeaderIcon, columnHeaderText } from '../constants';
 import { ColumnKey } from '../schemas/home-assistant';
+import { ColumnType } from '../types/general';
 import { EntityObject, HaIcon, SoftwareVersion } from '../types/home-assistant';
 import type { ConfigManager } from './config-manager';
 import semver from 'semver';

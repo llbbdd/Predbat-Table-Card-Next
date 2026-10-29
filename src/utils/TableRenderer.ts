@@ -1,4 +1,4 @@
-import { allColumns } from '../constants';
+import { allColumns, expensiveCost } from '../constants';
 import { PredbatData } from '../PredbatData';
 import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRowData } from '../schemas/predbat';
@@ -196,7 +196,7 @@ export class TableRenderer {
 
               const maxValue = this._getColumnGroupMax(column, predbatData.plan);
 
-              cellInner.appendChild(barElement(columnData.value, maxValue, columnData.colour, column === 'export-column', false));
+              cellInner.appendChild(barElement(columnData.value, maxValue, column === 'export-column', false, expensiveCost));
 
               break;
             }
@@ -255,7 +255,7 @@ export class TableRenderer {
               const maxValue = this._getColumnGroupMax(column, predbatData.plan);
               const roundedValue = Math.round(columnData.value);
 
-              cellInner.appendChild(barElement(roundedValue, maxValue, columnData.colour, false, false));
+              cellInner.appendChild(barElement(roundedValue, maxValue, false, false, 100));
 
               break;
             }
@@ -264,7 +264,7 @@ export class TableRenderer {
                 const maxValue = this._getColumnGroupMax(column, predbatData.plan);
                 const invertBarColour = column === 'pv-column' || column === 'net-energy-column'; // low value is green, high is red; invert for low value is red, high is green
 
-                cellInner.appendChild(barElement(columnData.value, maxValue, columnData.colour, invertBarColour, true));
+                cellInner.appendChild(barElement(columnData.value, maxValue, invertBarColour, true, 100));
               }
               else {
                 cellInner.style.color = columnData.colour;

@@ -392,13 +392,15 @@ export function socBarElement(value: number, colour: string, change: 'rising' | 
   return container;
 }
 
-export function barElement(value: number, maxValue: number, colour: string, inverted: boolean, hideZero: boolean): HTMLDivElement {
+export function barElement(value: number, maxValue: number, inverted: boolean, hideZero: boolean, maxValueForColourScale: number): HTMLDivElement {
   if (maxValue <= 0) throw new Error(`maxValue is ${maxValue}`);
+  if (maxValueForColourScale <= 0) throw new Error(`maxValueForColourScale is ${maxValueForColourScale}`);
 
   const container = divElement('bar-element-container');
   const isNegative = value < 0;
   const absValue = Math.abs(value);
-  const percentage = Math.min(Math.max((absValue / maxValue) * 100, 0), 100);
+  const widthPercentage = Math.min(Math.max((absValue / maxValue) * 100, 0), 100);
+  const colourPercentage = Math.min(Math.max((absValue / maxValueForColourScale) * 100, 0), 100);
 
   let barColour: string;
   const negativeColour = inverted ? '#f00' : '#0f0';
@@ -407,20 +409,20 @@ export function barElement(value: number, maxValue: number, colour: string, inve
     barColour = negativeColour;
   }
   else if (inverted) {
-    const green = Math.round((percentage / 100) * 255);
+    const green = Math.round((colourPercentage / 100) * 255);
     const red = 255 - green;
 
     barColour = `rgb(${red}, ${green}, 0)`;
   }
   else {
-    const red = Math.round((percentage / 100) * 255);
+    const red = Math.round((colourPercentage / 100) * 255);
     const green = 255 - red;
 
     barColour = `rgb(${red}, ${green}, 0)`;
   }
 
   const barFill = divElement('bar-element-fill');
-  barFill.style.width = `${percentage}%`;
+  barFill.style.width = `${widthPercentage}%`;
   barFill.style.background = barColour;
   barFill.style.opacity = isNegative ? '0.25' : '0.3';
   if (isNegative) barFill.style.borderLeft = `2px solid ${negativeColour}`;

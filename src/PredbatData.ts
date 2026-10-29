@@ -1,4 +1,4 @@
-import { colourRangeForPrices, white, columnsWithTotals } from './constants';
+import { colourRangeForPrices, white, columnsWithTotals, expensiveCost } from './constants';
 import { ColumnKey } from './schemas/home-assistant';
 import { PredbatRowData, RawData } from './schemas/predbat';
 import { change } from './utils/entity-utils';
@@ -164,7 +164,7 @@ export class PredbatData {
         },
         'import-column': row.import_rate_adjust_type !== undefined ? null : {
           value: row.import_rate,
-          colour: getColourFromScale(colourRangeForPrices.lower, colourRangeForPrices.upper, String(row.import_rate), 'redToGreen', false)
+          colour: getColourFromScale(0, expensiveCost, String(Math.min(row.import_rate, expensiveCost)), 'redToGreen', false)
         },
         'export-column': row.export_rate_adjust_type !== undefined ? null : {
           value: row.export_rate,

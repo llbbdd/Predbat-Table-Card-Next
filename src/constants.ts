@@ -90,3 +90,5 @@ export const columnHeaderIcon: { [K in ColumnType]: string } = {
   'xload-column': 'transmission-tower',
   'net-energy-column': 'flash'
 } as const;
+
+export const expensiveCost = 40;

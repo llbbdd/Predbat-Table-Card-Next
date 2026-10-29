@@ -1,4 +1,5 @@
 import { ColumnKey } from './schemas/home-assistant';
+import { ColumnType } from './types/general';
 
 export const restApiPort = 5052;
 
@@ -89,5 +90,3 @@ export const columnHeaderIcon: { [K in ColumnType]: string } = {
   'xload-column': 'transmission-tower',
   'net-energy-column': 'flash'
 } as const;
-
-export type ColumnType = typeof allColumns[number];

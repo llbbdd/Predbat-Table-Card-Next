@@ -252,5 +252,3 @@ export class HomeAssistantService {
     ];
   }
 }
-
-// TODO - relies on predbat (docker or ????) and octopus energy integration

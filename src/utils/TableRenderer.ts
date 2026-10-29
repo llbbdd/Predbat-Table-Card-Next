@@ -6,7 +6,7 @@ import { WeatherRowData } from '../services/weather-service';
 import { EntityObject, TemperatureUnit } from '../types/home-assistant';
 import { ConfigManager } from './config-manager';
 import { getArrayForEntityForceStates } from './entity-utils';
-import { convertTimeStampToFriendly, formatFriendlyDate } from './general-utils';
+import { convertTimeStampToFriendly, formatFriendlyDate, formatTotal } from './general-utils';
 import { weatherIconElement, spanElement, temperatureElement, rainChanceElement, tableCellElement, tableHeaderRowElement, tableElement, tableBodyElement, tableRowElement, editOveridesIconElement, overrideButtonsDivElement, divElement, overrideIconElement, modalCloseIcon, numberInputElement, buttonElement, errorCard, tableHeadElement, getOverrideIconStyles, infoCard, loadingCard, barElement, socBarElement } from './html-utils';
 import { Temporal } from '@js-temporal/polyfill';
 
@@ -365,7 +365,7 @@ export class TableRenderer {
             const value = dayTotals[column];
 
             if (value !== undefined) {
-              cellInner.textContent = value.toFixed(2);
+              cellInner.textContent = formatTotal(column, value);
               cellInner.classList.add('total-cell');
             }
 

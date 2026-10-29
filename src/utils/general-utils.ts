@@ -37,6 +37,16 @@ export function cleanAndValidateVersion(version: string | undefined): string | n
   return cleaned;
 }
 
+export function formatTotal(column: string, value: number): string {
+  if (column === 'cost-column' || column === 'total-column') {
+    const pounds = value / 100;
+
+    return pounds < 0 ? `-£${Math.abs(pounds).toFixed(2)}` : `£${pounds.toFixed(2)}`;
+  }
+
+  return value.toFixed(2);
+}
+
 export function getColourFromScale(scaleMinimum: number, scaleMaximum: number, valueInPence: string, colourScheme: 'redToGreen' | 'redToBlue', reverse = false): string {
   const value = parseFloat(valueInPence);
 

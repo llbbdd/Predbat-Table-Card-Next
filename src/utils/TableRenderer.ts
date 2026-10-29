@@ -396,6 +396,16 @@ export class TableRenderer {
       for (const group of Object.values(this._columnGroups)) {
         this._equalizeColumnWidths(this._container, group);
       }
+
+      const currentRow = this._container.querySelector('tr.current-time');
+
+      if (currentRow !== null) {
+        const rowTop = (currentRow as HTMLElement).offsetTop;
+        const rowHeight = (currentRow as HTMLElement).offsetHeight;
+        const containerHeight = this._container.clientHeight;
+
+        this._container.scrollTop = rowTop - (containerHeight / 2) + (rowHeight / 2);
+      }
     });
   }
 

@@ -76,6 +76,7 @@ These config items can either be set in the YAML or the Home Assistant UI config
 | `columns`    | YES    | See [Column Options](#column-options) |
 | `battery_lower_limit`    | NO    | See [Battery Lower Limit](#battery-lower-limit) |
 | `weather_entity`    | NO    | See [Weather Forecast](#weather-forecast) |
+| `max_import_export_value_for_colour_scale`    | NO    | See [Import/Export Colour Scale](#importexport-colour-scale) |
 
 ### Example YAML config
 
@@ -100,6 +101,7 @@ columns:
   - net-energy-column
   - xload-column
 weather_entity: weather.forecast_home_2
+max_import_export_value_for_colour_scale: 100
 ```
 
 ## Day Limit
@@ -138,6 +140,10 @@ Column order can be changed by re-ordering the YAML.
 ## Weather Forecast
 
 Add a valid weather forecast entity using `weather_entity`, and add any combination of `weather-column`, `temp-column` or `rain-column` to the columns array. The column will be hidden until forecast data is received. For valid weather forecast entities see [Home Assistant docs](https://community.home-assistant.io/t/definitive-guide-to-weather-integrations/736419).
+
+## Import/Export Colour Scale
+
+By default, import and export bar colours are scaled from green (0p) to red (100p). Setting `max_import_export_value_for_colour_scale` changes the price at which the bars reach full colour. For example, setting it to 40 means a 20p price is halfway up the scale and anything above 40p shows as fully red (import) or fully green (export). This only affects the colour of the import and export bars, so bar widths, and all other columns, are unchanged.
 
 ## Battery Lower Limit
 

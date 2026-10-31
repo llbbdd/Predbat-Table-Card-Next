@@ -40,7 +40,11 @@ export const PredbatTableCardConfigSchema = z.object({
     (val) => val > 0 && val < 100,
     { message: 'battery_lower_limit must be greater than 0 and less than 100, if defined' }
   ).optional().default(0),
-  show_totals: z.boolean().optional().default(false)
+  show_totals: z.boolean().optional().default(false),
+  max_import_export_value_for_colour_scale: z.number().refine(
+    (val) => val > 0,
+    { message: 'max_import_export_value_for_colour_scale must be greater than 0, if defined' }
+  ).optional().default(100)
 });
 
 export type HassEntity = {

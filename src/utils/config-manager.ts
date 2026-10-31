@@ -45,6 +45,12 @@ export class ConfigManager {
     return this._config;
   }
 
+  public get maxImportExportValueForColourScale(): number {
+    if (this._config === null) throw new Error('Config data not received');
+
+    return this._config.max_import_export_value_for_colour_scale;
+  }
+
   public get carChargeSwitch(): 'on' | 'off' | undefined {
     if (this._config === null) throw new Error('Config data not received');
 

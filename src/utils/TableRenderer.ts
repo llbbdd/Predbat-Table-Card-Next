@@ -1,4 +1,4 @@
-import { allColumns, expensiveCost } from '../constants';
+import { allColumns } from '../constants';
 import { PredbatData } from '../PredbatData';
 import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRowData } from '../schemas/predbat';
@@ -54,6 +54,8 @@ export class TableRenderer {
 
   public render(predbatData: PredbatData, temperatureUnit: TemperatureUnit | null, dayLimit: number, generatingPlan: boolean, carChargeSwitch: 'on' | 'off' | undefined, forceEntityObjects: EntityObject[], weather: Map<string, WeatherRowData> | null): void {
     if (this._container === null) return;
+
+    const maxImportExportValueForColourScale = this._configManager.maxImportExportValueForColourScale;
 
     const leftColumn = divElement('table-left-column');
     const leftTable = tableElement();
@@ -196,7 +198,7 @@ export class TableRenderer {
 
               const maxValue = this._getColumnGroupMax(column, predbatData.plan);
 
-              cellInner.appendChild(barElement(columnData.value, maxValue, column === 'export-column', false, expensiveCost));
+              cellInner.appendChild(barElement(columnData.value, maxValue, column === 'export-column', false, maxImportExportValueForColourScale));
 
               break;
             }
@@ -234,7 +236,7 @@ export class TableRenderer {
             ////
             case 'temp-column': {
               if (typeof columnData.value !== 'number') throw new Error('Invalid temp-column data' + columnData.value);
-              if(temperatureUnit === null) throw new Error('temperatureUnit must have a value to render temp-column'); // this error should be impossible due to the column being excluded for having no data
+              if (temperatureUnit === null) throw new Error('temperatureUnit must have a value to render temp-column'); // this error should be impossible due to the column being excluded for having no data
 
               cellInner.appendChild(temperatureElement(columnData.value, columnData.colour, temperatureUnit));
 
@@ -255,7 +257,7 @@ export class TableRenderer {
               const maxValue = this._getColumnGroupMax(column, predbatData.plan);
               const roundedValue = Math.round(columnData.value);
 
-              cellInner.appendChild(barElement(roundedValue, maxValue, false, false, 100));
+              cellInner.appendChild(barElement(roundedValue, maxValue, false, false, maxValue));
 
               break;
             }
@@ -264,7 +266,7 @@ export class TableRenderer {
                 const maxValue = this._getColumnGroupMax(column, predbatData.plan);
                 const invertBarColour = column === 'pv-column' || column === 'net-energy-column'; // low value is green, high is red; invert for low value is red, high is green
 
-                cellInner.appendChild(barElement(columnData.value, maxValue, invertBarColour, true, 100));
+                cellInner.appendChild(barElement(columnData.value, maxValue, invertBarColour, true, maxValue));
               }
               else {
                 cellInner.style.color = columnData.colour;
@@ -306,7 +308,7 @@ export class TableRenderer {
 
               const editOveridesIcon = activeEntity ? this._createButtonForOverrides(activeEntity, friendlyTimeValue, 18, false, isClickable) : editOveridesIconElement(isHighlighted, isClickable);
 
-              if (isClickable) editOveridesIcon.addEventListener('click', () => this._createPopUpForOverrides(friendlyTimeValue, rightColumns.includes('export-column') , forceEntityObjects));
+              if (isClickable) editOveridesIcon.addEventListener('click', () => this._createPopUpForOverrides(friendlyTimeValue, rightColumns.includes('export-column'), forceEntityObjects));
 
               cellInner.appendChild(editOveridesIcon);
 

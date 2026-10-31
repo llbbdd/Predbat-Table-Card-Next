@@ -46,38 +46,56 @@ export const configForm = {
         'overrides-column'
       ]
     },
-    {
-      name: 'day_limit',
-      selector: {
-        number: {
-          min: 1,
-          max: 7,
-          step: 1,
-          mode: 'box'
-        }
-      },
-      default: 2
-    },
-    {
-      name: 'battery_lower_limit',
-      selector: {
-        number: {
-          min: 0,
-          max: 100,
-          step: 1,
-          mode: 'box'
-        }
-      },
-      default: 0
-    },
     { name: 'weather_entity', selector: { entity: {} } },
     {
       name: 'entity',
       selector: { entity: {} },
       default: 'predbat.plan_html'
     },
-    { name: 'iboost_history_entity', selector: { entity: {} } }
-
+    { name: 'iboost_history_entity', selector: { entity: {} } },
+    {
+      name: '',
+      title: 'Data Visualisation',
+      type: 'expandable',
+      schema: [
+        {
+          name: 'day_limit',
+          selector: {
+            number: {
+              min: 1,
+              max: 7,
+              step: 1,
+              mode: 'box'
+            }
+          },
+          default: 2
+        },
+        {
+          name: 'battery_lower_limit',
+          selector: {
+            number: {
+              min: 0,
+              max: 100,
+              step: 1,
+              mode: 'box'
+            }
+          },
+          default: 0
+        },
+        {
+          name: 'max_import_export_value_for_colour_scale',
+          selector: {
+            number: {
+              min: 1,
+              max: 200,
+              step: 1,
+              mode: 'box'
+            }
+          },
+          default: 100
+        }
+      ]
+    }
   ],
   computeLabel: (schema: Schema): string | undefined => {
     switch (schema.name) {
@@ -93,6 +111,8 @@ export const configForm = {
         return 'Predbat Plan Entity';
       case 'iboost_history_entity':
         return 'iBoost History Entity';
+      case 'max_import_export_value_for_colour_scale':
+        return 'Import/export colour scale maximum (p)';
     }
 
     return undefined;
@@ -111,6 +131,8 @@ export const configForm = {
         return 'Optional - Entity providing the Predbat plan (default: predbat.plan_html)';
       case 'iboost_history_entity':
         return 'Optional - Home Assistant entity whose recorder history supplies historic iBoost values';
+      case 'max_import_export_value_for_colour_scale':
+        return 'Optional - Price (p) at which the import/export bar reaches full colour (default: 100)';
     }
 
     return undefined;

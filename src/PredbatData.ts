@@ -171,7 +171,7 @@ export class PredbatData {
           colour: getColourFromScale(colourRangeForPrices.lower, colourRangeForPrices.upper, String(row.export_rate), 'redToGreen', false)
         },
         'pv-column': {
-          // ASK - Predbat correctly predicts 0kWh PV after sundown, but records 0.01kWh once the time passes - Why?
+          // https://github.com/springfall2008/batpred/issues/5904#issuecomment-6563634475
           // Round down 0.01 to 0 to compensate for Predbat bug - This also removes the value from the daily total
           value: row.pv_forecast === 0.01 ? 0 : row.pv_forecast,
           colour: row.pv_color

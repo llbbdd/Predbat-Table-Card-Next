@@ -69,7 +69,7 @@ const RawRowSchema = z.object({
   iboost_change: z.number().optional(),
   iboost_color: ColorSchema.optional(),
   extra_load_total: z.number(),
-  extra_color: ColorSchema, // ASK - relates to extra_load_total?
+  extra_color: ColorSchema, // colour for extra_load_total
   soc_percent: z.number(),
   soc_change: z.number(),
   soc_sym: HtmlEntitySchema,
@@ -95,7 +95,7 @@ export const PredbatRawDataSchema = z.object({
   rows: z.array(RawRowSchema).transform((rows) =>
     rows.map((row) => ({
       ...row,
-      cost_change: row.cost_change * 100 // ASK - predbat bug - convert pounds to pence
+      cost_change: row.cost_change * 100 // convert pounds to pence
     }))
   ),
   import_cost_threshold: z.number(),

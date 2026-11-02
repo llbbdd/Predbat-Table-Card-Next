@@ -1,10 +1,6 @@
 import z from 'zod';
 
-const HtmlEntitySchema = z.enum([
-  '&searr;',
-  '&nearr;',
-  '&rarr;'
-]);
+const HtmlEntitySchema = z.string(); // This can be loose because icons are generated in code
 
 const ColorSchema = z.string().regex(/^#[0-9A-Fa-f]{6}$/);
 

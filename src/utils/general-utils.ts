@@ -1,26 +1,49 @@
 import semver from 'semver';
 import { logger } from './logger';
+import { Temporal } from '@js-temporal/polyfill';
+
+const weekdayFormatter = new Intl.DateTimeFormat('en-GB', {
+  weekday: 'short',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23'
+});
 
 export function convertTimeStampToFriendly(dateString: string): string {
-  // Fix timezone colon if missing (e.g., +0000 → +00:00)
-  const date = new Date(fixTimezoneOffset(dateString));
+  const normalised = normaliseOffset(dateString);
 
-  if (isNaN(date.getTime())) {
+  let instant: Temporal.Instant;
+
+  try {
+    instant = Temporal.Instant.from(normalised);
+  }
+  catch {
     throw new Error(`Invalid date string: ${dateString}`);
   }
 
-  const formatter = new Intl.DateTimeFormat('en-GB', {
-    weekday: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
+  const parts = weekdayFormatter.formatToParts(new Date(instant.epochMilliseconds));
+  const get = (type: Intl.DateTimeFormatPartTypes): string =>
+    parts.find(part => part.type === type)?.value ?? '';
 
-  return formatter.format(date).replace(',', '');
+  return `${get('weekday')} ${get('hour')}:${get('minute')}`;
 }
 
-function fixTimezoneOffset(dateString: string): string {
-  return dateString.replace(/([+-]\d{2})(\d{2})$/, '$1:$2');
+function normaliseOffset(dateString: string): string {
+  const suffix = dateString.slice(-6);
+
+  if (/^[+-]\d{2}:\d{2}$/.test(suffix)) {
+    return dateString;
+  }
+
+  if (/^[+-]\d{4}$/.test(suffix.slice(-5))) {
+    return `${dateString.slice(0, -5)}${dateString.slice(-5, -2)}:${dateString.slice(-2)}`;
+  }
+
+  if (dateString.endsWith('Z')) {
+    return dateString;
+  }
+
+  throw new Error(`Date string has no timezone offset: ${dateString}`);
 }
 
 export function cleanAndValidateVersion(version: string | undefined): string | null {

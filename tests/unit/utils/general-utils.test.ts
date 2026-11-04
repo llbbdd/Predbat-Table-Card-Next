@@ -19,9 +19,11 @@ describe('general-utils', () => {
 
     describe('Invalid inputs (should throw)', () => {
       it.each([
-        ['', 'Invalid date string: '],
-        ['invalid', 'Invalid date string: invalid'],
-        ['not-a-date', 'Invalid date string: not-a-date']
+        ['', 'Date string has no timezone offset: '],
+        ['invalid', 'Date string has no timezone offset: invalid'],
+        ['not-a-date', 'Date string has no timezone offset: not-a-date'],
+        ['2024-13-45T99:99:99+0000', 'Invalid date string: 2024-13-45T99:99:99+0000'],
+        ['garbage+0000', 'Invalid date string: garbage+0000']
       ])('should throw error for "%s" with message "%s"', (input, expectedMessage) => {
         expect(() => convertTimeStampToFriendly(input)).toThrow(expectedMessage);
       });

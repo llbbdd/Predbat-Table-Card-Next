@@ -164,29 +164,4 @@ export class WeatherService {
   public set connection(connection: Connection) {
     this._connection = connection;
   }
-
-  public isLabelDuringNight(label: string): boolean {
-    const parts = label.split(' ');
-
-    if (parts.length !== 2) {
-      throw new Error(`Invalid label format: ${label}. Expected format: "Day HH:mm"`);
-    }
-
-    const [, time] = parts;
-    const [hours, minutes] = time.split(':').map(Number);
-
-    if (isNaN(hours) || isNaN(minutes) || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
-      throw new Error(`Invalid time: ${time}. Expected format: "HH:mm"`);
-    }
-
-    const labelMinutes = hours * 60 + minutes;
-
-    const sunrise = new Date(this.nextRising);
-    const sunset = new Date(this.nextSetting);
-
-    const sunriseMinutes = sunrise.getHours() * 60 + sunrise.getMinutes();
-    const sunsetMinutes = sunset.getHours() * 60 + sunset.getMinutes();
-
-    return labelMinutes < sunriseMinutes || labelMinutes >= sunsetMinutes;
-  }
 }

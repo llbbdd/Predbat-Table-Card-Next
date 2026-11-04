@@ -87,12 +87,6 @@ export class ConfigManager {
     return this._config.battery_lower_limit;
   }
 
-  public get showTotals(): boolean {
-    if (this._config === null) throw new Error('Config data not received');
-
-    return this._config.show_totals;
-  }
-
   public get visibleColumns(): ColumnKey[] {
     if (this._config === null) throw new Error('Config data not received');
 

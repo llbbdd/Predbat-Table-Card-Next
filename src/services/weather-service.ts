@@ -140,18 +140,6 @@ export class WeatherService {
     this._sun = sun;
   }
 
-  public get nextRising(): Date {
-    if (this._sun === null) throw new Error('this._sun is null');
-
-    return new Date(this._sun.attributes.next_rising);
-  }
-
-  public get nextSetting(): Date {
-    if (this._sun === null) throw new Error('this._sun is null');
-
-    return new Date(this._sun.attributes.next_setting);
-  }
-
   public async unsubscribe(): Promise<void> {
     if (this._unsubscribeWeather !== null) {
       await this._unsubscribeWeather();

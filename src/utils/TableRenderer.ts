@@ -7,7 +7,7 @@ import { EntityObject, TemperatureUnit } from '../types/home-assistant';
 import { ConfigManager } from './config-manager';
 import { getArrayForEntityForceStates } from './entity-utils';
 import { convertTimeStampToFriendly, formatFriendlyDate, formatTotal } from './general-utils';
-import { weatherIconElement, spanElement, temperatureElement, rainChanceElement, tableCellElement, tableHeaderRowElement, tableElement, tableBodyElement, tableRowElement, editOveridesIconElement, overrideButtonsDivElement, divElement, overrideIconElement, modalCloseIcon, numberInputElement, buttonElement, errorCard, tableHeadElement, getOverrideIconStyles, infoCard, loadingCard, barElement, socBarElement } from './html-utils';
+import { weatherIconElement, spanElement, temperatureElement, rainChanceElement, tableCellElement, tableHeaderRowElement, tableElement, tableBodyElement, tableRowElement, editOveridesIconElement, overrideButtonsDivElement, divElement, overrideIconElement, modalCloseIcon, numberInputElement, buttonElement, errorCard, tableHeadElement, getOverrideIconStyles, infoCard, barElement, socBarElement } from './html-utils';
 import { Temporal } from '@js-temporal/polyfill';
 
 export class TableRenderer {
@@ -419,11 +419,6 @@ export class TableRenderer {
   public renderInfo = (message: string): void => {
     if (this._container === null) return;
     this._container.replaceChildren(infoCard(message, this._configManager.config));
-  };
-
-  public renderLoading = (message: string): void => {
-    if (this._container === null) return;
-    this._container.replaceChildren(loadingCard(message));
   };
 
   private _extractManualOverrideKey(entityName: string): string {

@@ -349,22 +349,6 @@ export function infoCard(message: string, config: ConfigManager['config']): HTML
   return messageCard(message, config, 'info');
 }
 
-export function loadingCard(message: string): HTMLDivElement {
-  const container = document.createElement('div');
-  container.className = 'loading-container';
-
-  const spinner = document.createElement('div');
-  spinner.className = 'loading-spinner';
-
-  const text = document.createElement('div');
-  text.className = 'loading-text';
-  text.textContent = message;
-
-  container.appendChild(spinner);
-  container.appendChild(text);
-  return container;
-}
-
 export function socBarElement(value: number, colour: string, change: 'rising' | 'same' | 'falling', batteryMinSoC = 0): HTMLDivElement {
   const container = divElement('bar-element-container');
   const clampedValue = Math.min(Math.max(value, batteryMinSoC), 100);

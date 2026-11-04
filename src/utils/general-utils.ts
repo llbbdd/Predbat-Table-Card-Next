@@ -31,19 +31,25 @@ export function convertTimeStampToFriendly(dateString: string): string {
 function normaliseOffset(dateString: string): string {
   const suffix = dateString.slice(-6);
 
+  // Already colonised: ±HH:MM
   if (/^[+-]\d{2}:\d{2}$/.test(suffix)) {
     return dateString;
   }
 
+  // Basic format: ±HHMM (Predbat's usual output)
   if (/^[+-]\d{4}$/.test(suffix.slice(-5))) {
     return `${dateString.slice(0, -5)}${dateString.slice(-5, -2)}:${dateString.slice(-2)}`;
   }
 
+  // Trailing Z
   if (dateString.endsWith('Z')) {
     return dateString;
   }
 
-  throw new Error(`Date string has no timezone offset: ${dateString}`);
+  // Bare timestamp (no offset)
+  // Predbat emits these for naive datetimes
+  // Treat as UTC so the formatter renders the wall-clock digits Predbat wrote
+  return `${dateString}Z`;
 }
 
 export function cleanAndValidateVersion(version: string | undefined): string | null {

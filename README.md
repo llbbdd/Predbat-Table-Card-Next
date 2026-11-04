@@ -166,3 +166,7 @@ The following Predbat overrides are supported:
 ## Requirements
 
 Needs Predbat version > 8.29.7
+
+## Inspiration
+
+Built on the idea and layout of the now abandoned [predbat-table-card by pacemaker82](https://github.com/pacemaker82/PredBat-Table-Card).

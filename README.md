@@ -155,8 +155,8 @@ Overrides allow Predbat to be forced into a user-defined state, regardless of th
 
 The following Predbat overrides are supported:
 - Force Demand
-- Force/Prevent Charge
-- Force/Prevent Export
+- Force/Prevent Grid Charge (doesn't affect solar charge)
+- Force/Prevent Grid Export
 - Force SoC Target
 
 ## Known Issues

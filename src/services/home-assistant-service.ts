@@ -244,8 +244,8 @@ export class HomeAssistantService {
   public getOverrideEntities(): EntityObject[] {
     return [
       { entityName: 'select.predbat_manual_demand', entityIcon: 'home-lightning-bolt', entityTitle: 'Force Demand' },
-      { entityName: 'select.predbat_manual_charge', entityIcon: 'battery-plus', entityTitle: 'Force Charge' },
-      { entityName: 'select.predbat_manual_freeze_charge', entityIcon: 'battery-plus', entityTitle: 'Prevent Charge' },
+      { entityName: 'select.predbat_manual_charge', entityIcon: 'battery-plus', entityTitle: 'Force Grid Charge' },
+      { entityName: 'select.predbat_manual_freeze_charge', entityIcon: 'battery-plus', entityTitle: 'Prevent Grid Charge' },
       { entityName: 'select.predbat_manual_export', entityIcon: 'transmission-tower-import', entityTitle: 'Force Export' },
       { entityName: 'select.predbat_manual_freeze_export', entityIcon: 'transmission-tower-import', entityTitle: 'Prevent Export' },
       { entityName: 'select.predbat_manual_soc', entityIcon: 'percent', entityTitle: 'Force SoC' }

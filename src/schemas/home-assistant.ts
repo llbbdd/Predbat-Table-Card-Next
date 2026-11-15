@@ -31,6 +31,10 @@ export const PredbatTableCardConfigSchema = z.object({
   // Optional
   weather_entity: z.string().optional(),
   iboost_history_entity: z.string().optional(),
+  iboost_kwh: z.number().refine(
+    (val) => val > 0,
+    { message: 'iboost_kwh must be greater than 0, if defined' }
+  ).optional().default(3.0),
   car_charge_switch: z.enum(['on', 'off']).optional(),
   day_limit: z.number().refine(
     (val) => val > 0 && val < 14,

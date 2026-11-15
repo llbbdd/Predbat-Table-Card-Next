@@ -1,4 +1,4 @@
-import { allColumns, iBoost_kwh, iBoostLoadAdjustEntity, iBoostSlotsEntity } from '../constants';
+import { allColumns, iBoostLoadAdjustEntity, iBoostSlotsEntity } from '../constants';
 import { PredbatData } from '../PredbatData';
 import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRowData } from '../schemas/predbat';
@@ -638,7 +638,7 @@ export class TableRenderer {
 
     await this._callInputTextSetService(iBoostSlotsEntity, updatedSlots.join(','));
 
-    const loadAdjustOptions = updatedSlots.map((slot: string) => `${this._extractTimeFromFriendlySlot(slot)}=${iBoost_kwh}`);
+    const loadAdjustOptions = updatedSlots.map((slot: string) => `${this._extractTimeFromFriendlySlot(slot)}=${this._configManager.iboostKwh}`);
 
     if (loadAdjustOptions.length > 0) {
       await this._callSelectOptionService(iBoostLoadAdjustEntity, loadAdjustOptions.join(','));

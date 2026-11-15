@@ -54,6 +54,18 @@ export const configForm = {
     },
     { name: 'iboost_history_entity', selector: { entity: {} } },
     {
+      name: 'iboost_kwh',
+      selector: {
+        number: {
+          min: 0.1,
+          max: 20,
+          step: 0.1,
+          mode: 'box'
+        }
+      },
+      default: 3.0
+    },
+    {
       name: '',
       title: 'Data Visualisation',
       type: 'expandable',
@@ -111,6 +123,8 @@ export const configForm = {
         return 'Predbat Plan Entity';
       case 'iboost_history_entity':
         return 'iBoost History Entity';
+      case 'iboost_kwh':
+        return 'iBoost Heater kWh';
       case 'max_import_export_value_for_colour_scale':
         return 'Import/export colour scale maximum (p)';
     }
@@ -131,6 +145,8 @@ export const configForm = {
         return 'Optional - Entity providing the Predbat plan (default: predbat.plan_html)';
       case 'iboost_history_entity':
         return 'Optional - Home Assistant entity whose recorder history supplies historic iBoost values';
+      case 'iboost_kwh':
+        return 'Optional - Immersion heater rating in kWh, used when Force iBoost writes the Predbat load adjustment (default: 3.0)';
       case 'max_import_export_value_for_colour_scale':
         return 'Optional - Price (p) at which the import/export bar reaches full colour (default: 100)';
     }

@@ -92,4 +92,10 @@ export class ConfigManager {
 
     return this._config.columns;
   }
+
+  public get iboostKwh(): number {
+    if (this._config === null) throw new Error('Config data not received');
+
+    return this._config.iboost_kwh;
+  }
 }

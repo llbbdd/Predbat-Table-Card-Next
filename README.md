@@ -159,6 +159,8 @@ The following Predbat overrides are supported:
 - Force/Prevent Grid Export
 - Force SoC Target
 
+Home Assistant imposes a limit of 25 enforcements per override. This may not be the case if predbat is using the database manager component, but this is untested.
+
 ## Known Issues
 - Sometimes the half-hour just passed disappears, and I've no idea why. If you check the Predbat web plan, and click between Plan and History, you'll see it's missing there too.
 - Weather forecast data is only supplied for the future, so information disappears as the day passes.

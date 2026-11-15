@@ -151,15 +151,88 @@ By default, SoC bar colours are scaled from red (0%) to green (100%). Since the 
 
 ## Override Actions
 
-Overrides allow Predbat to be forced into a user-defined state, regardless of the plan, in any half hour slot. For example, a slot intended for charging can be forced to export instead.
+Overrides allow Predbat to be forced into a user-defined state, regardless of the plan, in any half-hour slot. For example, a slot intended for charging can be forced to export instead.
 
 The following Predbat overrides are supported:
 - Force Demand
 - Force/Prevent Grid Charge (doesn't affect solar charge)
 - Force/Prevent Grid Export
 - Force SoC Target
+- Force iBoost
 
-Home Assistant imposes a limit of 25 enforcements per override. This may not be the case if predbat is using the database manager component, but this is untested.
+The iBoost override is not a Predbat feature; it is a card-level convenience built on Home Assistant helpers and an automation. It does not control Predbat's own iBoost model (switch.predbat_iboost_enable / binary_sensor.predbat_iboost_active). It does, however, affect Predbat's planning: the load adjustment written to select.predbat_manual_load_adjust is added to the predicted load for each forced slot, so the plan accounts for the extra consumption. Clicking the iBoost icon on a row toggles that half-hour slot in input_text.iboost_forced_slots and rewrites the Predbat load adjustment from the resulting slot list. A separate automation drives the physical device, turning it on when the current half-hour slot is in the forced list and off otherwise.
+
+Three manual additions are required. Firstly, Home Assistant needs the following helper:
+
+```yaml
+input_text:
+  iboost_forced_slots:
+    name: "iBoost Forced Slots"
+    max: 255
+    icon: mdi:water-boiler
+    initial: ""
+```
+
+Secondly, the following automation to turn the physical switch on and off based on whether the current half-hour slot is in the forced list:
+
+```yaml
+automation:
+  - id: iboost_forced_window_control
+    alias: "iBoost forced window control"
+    description: Turns the immersion heater on/off based on the slots listed in input_text.iboost_forced_slots
+    mode: restart
+    variables:
+      iboost_switch: switch.immersion_heater
+      slots_entity: input_text.iboost_forced_slots
+    triggers:
+      - trigger: state
+        entity_id: input_text.iboost_forced_slots
+      - trigger: time_pattern
+        minutes: "/1"
+    actions:
+      - variables:
+          raw: "{{ states(slots_entity).replace('+', '', 1) }}"
+          slots: >-
+            {% set ns = namespace(items=[]) %}
+            {% for entry in raw.split(',') %}
+              {% set trimmed = entry.strip() %}
+              {% if trimmed | length > 0 %}
+                {% set ns.items = ns.items + [trimmed] %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.items }}
+          current_slot: "{{ now().strftime('%a %H:') }}{{ '00' if now().minute < 30 else '30' }}"
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ current_slot in slots }}"
+            sequence:
+              - action: switch.turn_on
+                target:
+                  entity_id: "{{ iboost_switch }}"
+              - action: system_log.write
+                data:
+                  level: warning
+                  message: "iBoost ON {{ iboost_switch }} - current_slot={{ current_slot }} is in forced slots {{ slots }}"
+          - conditions: []
+            sequence:
+              - action: switch.turn_off
+                target:
+                  entity_id: "{{ iboost_switch }}"
+              - action: system_log.write
+                data:
+                  level: warning
+                  message: "iBoost OFF {{ iboost_switch }} - current_slot={{ current_slot }} is not in forced slots {{ slots }}"
+```
+
+Thirdly, set the immersion heater rating in the card config. This is used for the load adjustment value in each forced slot, so the plan accounts for the extra consumption:
+
+```yaml
+type: custom:predbat-card-next
+iboost_kwh: 3.0   # default; adjust to your element rating
+```
+
+Note: Home Assistant imposes a limit of 25 enforcements per override. This may not be the case if Predbat is using the database manager component, but this is untested.
 
 ## Known Issues
 - Sometimes the half-hour just passed disappears, and I've no idea why. If you check the Predbat web plan, and click between Plan and History, you'll see it's missing there too.

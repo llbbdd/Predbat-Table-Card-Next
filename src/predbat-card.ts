@@ -368,8 +368,10 @@ class PredbatTableCard extends HTMLElement {
     const overrideEntities = this._haService.getOverrideEntities();
 
     return overrideEntities.map(entity => {
-      const state = this._haService.getState(entity.entityName);
-      return `${entity.entityName}:${state.state || 'null'}`;
+      const isIboost = entity.entityName.endsWith('_load_adjust');
+      const entityId = isIboost ? 'input_text.iboost_forced_slots' : entity.entityName;
+      const state = this._haService.getState(entityId);
+      return `${entityId}:${state.state || 'null'}`;
     }).join('|');
   }
 }

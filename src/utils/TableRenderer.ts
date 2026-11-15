@@ -1,4 +1,4 @@
-import { allColumns, iBoostSlotsEntity } from '../constants';
+import { allColumns, iBoost_kwh, iBoostLoadAdjustEntity, iBoostSlotsEntity } from '../constants';
 import { PredbatData } from '../PredbatData';
 import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRowData } from '../schemas/predbat';
@@ -621,6 +621,7 @@ export class TableRenderer {
 
   private async _handleIboostOverrideClick(timeForSelectOverride: string, fromPopup: boolean): Promise<void> {
     if (this._callInputTextSetService === null) throw new Error('this._callInputTextSetService is null');
+    if (this._callSelectOptionService === null) throw new Error('this._callSelectOptionService is null');
 
     const tempEntity = this._getState(iBoostSlotsEntity);
     const currentSlots = tempEntity.state
@@ -637,12 +638,27 @@ export class TableRenderer {
 
     await this._callInputTextSetService(iBoostSlotsEntity, updatedSlots.join(','));
 
+    const loadAdjustOptions = updatedSlots.map((slot: string) => `${this._extractTimeFromFriendlySlot(slot)}=${iBoost_kwh}`);
+
+    if (loadAdjustOptions.length > 0) {
+      await this._callSelectOptionService(iBoostLoadAdjustEntity, loadAdjustOptions.join(','));
+    }
+    else {
+      await this._callSelectOptionService(iBoostLoadAdjustEntity, 'off');
+    }
+
     this._closePopupIfOpen(fromPopup);
 
     if (this._onUpdateRequested) this._onUpdateRequested();
   }
 
-  // Helper to close popup if open
+  private _extractTimeFromFriendlySlot(friendlySlot: string): string {
+    const match = friendlySlot.match(/(\d{2}:\d{2})$/);
+    if (match === null) throw new Error(`Invalid friendly slot "${friendlySlot}"`);
+
+    return match[1];
+  }
+
   private _closePopupIfOpen(fromPopup: boolean): void {
     if (!fromPopup) return;
 

@@ -94,3 +94,5 @@ export const columnHeaderIcon: { [K in ColumnType]: string } = {
 export const expensiveCost = 40;
 
 export const iBoostSlotsEntity = 'input_text.iboost_forced_slots';
+export const iBoostLoadAdjustEntity = 'select.predbat_manual_load_adjust';
+export const iBoost_kwh = 3.0;

@@ -258,7 +258,7 @@ export class HomeAssistantService {
       { entityName: 'select.predbat_manual_export', entityIcon: 'transmission-tower-import', entityTitle: 'Force Export' },
       { entityName: 'select.predbat_manual_freeze_export', entityIcon: 'transmission-tower-import', entityTitle: 'Prevent Export' },
       { entityName: 'select.predbat_manual_soc', entityIcon: 'percent', entityTitle: 'Force SoC' },
-      { entityName: 'select.predbat_manual_load_adjust', entityIcon: 'flash', entityTitle: 'Force iBoost' }
+      { entityName: 'select.predbat_manual_load_adjust', entityIcon: 'water-boiler', entityTitle: 'Force iBoost' }
     ];
   }
 }

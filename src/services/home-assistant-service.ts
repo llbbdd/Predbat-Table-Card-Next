@@ -82,6 +82,15 @@ export class HomeAssistantService {
     });
   };
 
+  public callInputTextSetService = async (entity_id: string, value: string): Promise<void> => {
+    if (this._hass === null) throw new Error('this._hass is null');
+
+    return this._hass.callService('input_text', 'set_value', {
+      entity_id: entity_id,
+      value: value
+    });
+  };
+
   public callInputNumberSetService = async (entity_id: string, value: string): Promise<void> => {
     if (this._hass === null) throw new Error('this._hass is null');
 
@@ -248,7 +257,8 @@ export class HomeAssistantService {
       { entityName: 'select.predbat_manual_freeze_charge', entityIcon: 'battery-plus', entityTitle: 'Prevent Grid Charge' },
       { entityName: 'select.predbat_manual_export', entityIcon: 'transmission-tower-import', entityTitle: 'Force Export' },
       { entityName: 'select.predbat_manual_freeze_export', entityIcon: 'transmission-tower-import', entityTitle: 'Prevent Export' },
-      { entityName: 'select.predbat_manual_soc', entityIcon: 'percent', entityTitle: 'Force SoC' }
+      { entityName: 'select.predbat_manual_soc', entityIcon: 'percent', entityTitle: 'Force SoC' },
+      { entityName: 'select.predbat_manual_load_adjust', entityIcon: 'flash', entityTitle: 'Force iBoost' }
     ];
   }
 }

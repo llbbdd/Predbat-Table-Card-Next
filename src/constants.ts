@@ -92,3 +92,5 @@ export const columnHeaderIcon: { [K in ColumnType]: string } = {
 } as const;
 
 export const expensiveCost = 40;
+
+export const iBoostSlotsEntity = 'input_text.iboost_forced_slots';

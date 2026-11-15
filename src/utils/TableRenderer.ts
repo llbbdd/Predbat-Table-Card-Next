@@ -1,4 +1,4 @@
-import { allColumns } from '../constants';
+import { allColumns, iBoostSlotsEntity } from '../constants';
 import { PredbatData } from '../PredbatData';
 import { HassEntity } from '../schemas/home-assistant';
 import { PredbatRowData } from '../schemas/predbat';
@@ -16,6 +16,7 @@ export class TableRenderer {
   private _onUpdateRequested: (() => void) | null = null;
   private _callInputNumberSetService: ((entityId: string, value: string) => Promise<void>) | null = null;
   private _callSelectOptionService: ((entityId: string, value: string) => Promise<void>) | null = null;
+  private _callInputTextSetService: ((entityId: string, value: string) => Promise<void>) | null = null;
   private _state: Record<string, HassEntity | undefined> | null = null;
 
   // Column groupings - defined once here
@@ -46,6 +47,10 @@ export class TableRenderer {
 
   public set callSelectOptionService(callback: (entity_id: string, option: string) => Promise<void>) {
     this._callSelectOptionService = callback;
+  }
+
+  public set callInputTextSetService(callback: (entityId: string, value: string) => Promise<void>) {
+    this._callInputTextSetService = callback;
   }
 
   public set state(state: Record<string, HassEntity | undefined>) {
@@ -286,17 +291,24 @@ export class TableRenderer {
               const isClickable = this._checkRowIsAllowedForOverride(forceEntityObjects, friendlyTimeValue);
 
               for (const forceEntity of forceEntityObjects) {
-                const tempEntity = this._getState(forceEntity.entityName);
-
-                const settings = getArrayForEntityForceStates(tempEntity)
-                  .map((s) => s.trim())
-                  .filter(Boolean);
-
                 const key = this._extractManualOverrideKey(forceEntity.entityName);
 
-                const isActive = key === 'soc'
-                  ? settings.some((entry) => entry.startsWith(`${friendlyTimeValue}=`))
-                  : settings.includes(friendlyTimeValue);
+                let isActive: boolean;
+
+                if (key === 'load_adjust') {
+                  isActive = this._isIboostSlotActive(friendlyTimeValue);
+                }
+                else {
+                  const tempEntity = this._getState(forceEntity.entityName);
+
+                  const settings = getArrayForEntityForceStates(tempEntity)
+                    .map((s) => s.trim())
+                    .filter(Boolean);
+
+                  isActive = key === 'soc'
+                    ? settings.some((entry) => entry.startsWith(`${friendlyTimeValue}=`))
+                    : settings.includes(friendlyTimeValue);
+                }
 
                 if (isActive) {
                   isHighlighted = true;
@@ -442,6 +454,17 @@ export class TableRenderer {
     return Temporal.PlainDateTime.compare(timeValueDate, currentSlot) === 0;
   }
 
+  private _isIboostSlotActive(friendlyTimeValue: string): boolean {
+    const slotsState = this._getState(iBoostSlotsEntity).state;
+    const slots = slotsState
+      .replace(/^\+/, '')
+      .split(',')
+      .map((entry: string) => entry.trim())
+      .filter(Boolean);
+
+    return slots.includes(friendlyTimeValue);
+  }
+
   private _getColumnGroupMax(column: string, plan: Map<string, PredbatRowData | null>): number {
     // Find which group this column belongs to
     let columnsToCheck: string[] = [column];
@@ -480,19 +503,22 @@ export class TableRenderer {
 
   private _createButtonForOverrides = (entityObject: EntityObject, timeForSelectOverride: string, size: number, fromPopup: boolean, isClickable: boolean): HTMLDivElement => {
     const key = this._extractManualOverrideKey(entityObject.entityName);
-    const tempEntity = this._getState(entityObject.entityName);
-
-    const settings = getArrayForEntityForceStates(tempEntity)
-      .map((s) => s.trim())
-      .filter(Boolean);
 
     let isActive: boolean;
 
-    if (key === 'soc') {
-      isActive = settings.some((entry) => entry.startsWith(`${timeForSelectOverride}=`));
+    if (key === 'load_adjust') {
+      isActive = this._isIboostSlotActive(timeForSelectOverride);
     }
     else {
-      isActive = settings.includes(timeForSelectOverride);
+      const tempEntity = this._getState(entityObject.entityName);
+
+      const settings = getArrayForEntityForceStates(tempEntity)
+        .map((s) => s.trim())
+        .filter(Boolean);
+
+      isActive = key === 'soc'
+        ? settings.some((entry) => entry.startsWith(`${timeForSelectOverride}=`))
+        : settings.includes(timeForSelectOverride);
     }
 
     const styles = getOverrideIconStyles(entityObject, isActive, isClickable);
@@ -503,7 +529,7 @@ export class TableRenderer {
     // Main icon
     const iconEl = overrideIconElement(entityObject.entityIcon, entityObject.entityTitle, size, styles);
 
-    if (isClickable) this._setupOverrideClickHandler(iconEl, entityObject.entityName, tempEntity, key, timeForSelectOverride, fromPopup);
+    if (isClickable) this._setupOverrideClickHandler(iconEl, entityObject.entityName, key, timeForSelectOverride, fromPopup);
 
     iconWrapper.appendChild(iconEl);
 
@@ -517,7 +543,6 @@ export class TableRenderer {
   private _setupOverrideClickHandler(
     iconEl: HTMLElement,
     entityName: string,
-    tempEntity: HassEntity,
     key: string,
     timeForSelectOverride: string,
     fromPopup: boolean
@@ -526,6 +551,7 @@ export class TableRenderer {
       iconEl.addEventListener('click', async () => {
         if (this._callSelectOptionService === null) throw new Error('this._callSelectOptionService is null');
 
+        const tempEntity = this._getState(entityName);
         const currentSettings = getArrayForEntityForceStates(tempEntity)
           .map((s) => s.trim())
           .filter(Boolean);
@@ -550,10 +576,16 @@ export class TableRenderer {
         }
       });
     }
+    else if (key === 'load_adjust') {
+      iconEl.addEventListener('click', () => {
+        void this._handleIboostOverrideClick(timeForSelectOverride, fromPopup);
+      });
+    }
     else {
       iconEl.addEventListener('click', async () => {
         if (this._callSelectOptionService === null) throw new Error('this._callSelectOptionService is null');
 
+        const tempEntity = this._getState(entityName);
         const currentSettings = getArrayForEntityForceStates(tempEntity);
         const isActive = currentSettings.includes(timeForSelectOverride);
 
@@ -585,6 +617,29 @@ export class TableRenderer {
     }
 
     await Promise.all(promises);
+  }
+
+  private async _handleIboostOverrideClick(timeForSelectOverride: string, fromPopup: boolean): Promise<void> {
+    if (this._callInputTextSetService === null) throw new Error('this._callInputTextSetService is null');
+
+    const tempEntity = this._getState(iBoostSlotsEntity);
+    const currentSlots = tempEntity.state
+      .replace(/^\+/, '')
+      .split(',')
+      .map((entry: string) => entry.trim())
+      .filter(Boolean);
+
+    const isActive = currentSlots.includes(timeForSelectOverride);
+
+    const updatedSlots = isActive
+      ? currentSlots.filter((entry: string) => entry !== timeForSelectOverride)
+      : [...currentSlots, timeForSelectOverride];
+
+    await this._callInputTextSetService(iBoostSlotsEntity, updatedSlots.join(','));
+
+    this._closePopupIfOpen(fromPopup);
+
+    if (this._onUpdateRequested) this._onUpdateRequested();
   }
 
   // Helper to close popup if open
@@ -724,7 +779,7 @@ export class TableRenderer {
 
     const tempEntity = this._state[entityId];
 
-    if (tempEntity === undefined) throw new Error('this._state is null');
+    if (tempEntity === undefined) throw new Error(`this._state["${entityId}"] is undefined`);
 
     return tempEntity;
   }

@@ -173,16 +173,16 @@ input_text:
     initial: ""
 ```
 
-Secondly, the following automation to turn the physical switch on and off based on whether the current half-hour slot is in the forced list:
+Secondly, with switch.iboost adjusted to match your own iBoost device entity, add the following automation to switch the device according to whether the current half-hour slot is in the forced list.
 
 ```yaml
 automation:
   - id: iboost_forced_window_control
     alias: "iBoost forced window control"
-    description: Turns the immersion heater on/off based on the slots listed in input_text.iboost_forced_slots
+    description: Turns the iboost device on/off based on the slots listed in input_text.iboost_forced_slots
     mode: restart
     variables:
-      iboost_switch: switch.immersion_heater
+      iboost_switch: switch.iboost
       slots_entity: input_text.iboost_forced_slots
     triggers:
       - trigger: state
@@ -212,20 +212,16 @@ automation:
                   entity_id: "{{ iboost_switch }}"
               - action: system_log.write
                 data:
-                  level: warning
-                  message: "iBoost ON {{ iboost_switch }} - current_slot={{ current_slot }} is in forced slots {{ slots }}"
+                  level: info
+                  message: "iBoost forced ON {{ iboost_switch }} - current_slot={{ current_slot }} is in forced slots {{ slots }}"
           - conditions: []
             sequence:
               - action: switch.turn_off
                 target:
                   entity_id: "{{ iboost_switch }}"
-              - action: system_log.write
-                data:
-                  level: warning
-                  message: "iBoost OFF {{ iboost_switch }} - current_slot={{ current_slot }} is not in forced slots {{ slots }}"
 ```
 
-Thirdly, set the immersion heater rating in the card config. This is used for the load adjustment value in each forced slot, so the plan accounts for the extra consumption:
+Thirdly, set the iboost device rating in the card config. This is used for the load adjustment value in each forced slot, so the plan accounts for the extra consumption:
 
 ```yaml
 type: custom:predbat-card-next

@@ -331,9 +331,7 @@ class PredbatTableCard extends HTMLElement {
       this._render();
     }
   }
-  // TODO - can gcoan's iboost override implementation be added to a force button?
-  // TODO - adjust select.predbat_mode (Control Charge, Control Charge & Discharge, Demand, etc)
-  // TODO - add holiday schedule - set input_number.predbat_holiday_days_left
+
   private _render(): void {
     if (this._planStatus === 'failed') {
       this._tableRenderer.renderError('Predbat plan not available');

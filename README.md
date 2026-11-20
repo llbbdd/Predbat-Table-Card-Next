@@ -179,7 +179,7 @@ Secondly, with switch.iboost adjusted to match your own iBoost device entity, ad
 automation:
   - id: iboost_forced_window_control
     alias: "iBoost forced window control"
-    description: Turns the iboost device on/off based on the slots listed in input_text.iboost_forced_slots
+    description: Turns the iboost device on based on the slots listed in input_text.iboost_forced_slots
     mode: restart
     variables:
       iboost_switch: switch.iboost
@@ -202,23 +202,15 @@ automation:
             {% endfor %}
             {{ ns.items }}
           current_slot: "{{ now().strftime('%a %H:') }}{{ '00' if now().minute < 30 else '30' }}"
-      - choose:
-          - conditions:
-              - condition: template
-                value_template: "{{ current_slot in slots }}"
-            sequence:
-              - action: switch.turn_on
-                target:
-                  entity_id: "{{ iboost_switch }}"
-              - action: system_log.write
-                data:
-                  level: info
-                  message: "iBoost forced ON {{ iboost_switch }} - current_slot={{ current_slot }} is in forced slots {{ slots }}"
-          - conditions: []
-            sequence:
-              - action: switch.turn_off
-                target:
-                  entity_id: "{{ iboost_switch }}"
+      - condition: template
+        value_template: "{{ current_slot in slots }}"
+      - action: switch.turn_on
+        target:
+          entity_id: "{{ iboost_switch }}"
+      - action: system_log.write
+        data:
+          level: info
+          message: "iBoost ON {{ iboost_switch }} — current_slot={{ current_slot }} is in forced slots {{ slots }}"
 ```
 
 Thirdly, set the iboost device rating in the card config. This is used for the load adjustment value in each forced slot, so the plan accounts for the extra consumption:

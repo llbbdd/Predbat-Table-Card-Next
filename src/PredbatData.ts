@@ -162,11 +162,11 @@ export class PredbatData {
           value: row.load_forecast,
           colour: row.load_color
         },
-        'import-column': row.import_rate_adjust_type !== undefined ? null : {
+        'import-column': row.import_rate_adjust_type === 'copy' ? null : {
           value: row.import_rate,
           colour: getColourFromScale(0, expensiveCost, String(Math.min(row.import_rate, expensiveCost)), 'redToGreen', false)
         },
-        'export-column': row.export_rate_adjust_type !== undefined ? null : {
+        'export-column': row.export_rate_adjust_type === 'copy' ? null : {
           value: row.export_rate,
           colour: getColourFromScale(colourRangeForPrices.lower, colourRangeForPrices.upper, String(row.export_rate), 'redToGreen', false)
         },

@@ -6,7 +6,7 @@ import { WeatherRowData } from '../services/weather-service';
 import { EntityObject, TemperatureUnit } from '../types/home-assistant';
 import { ConfigManager } from './config-manager';
 import { getArrayForEntityForceStates } from './entity-utils';
-import { convertTimeStampToFriendly, formatFriendlyDate, formatTotal } from './general-utils';
+import { convertTimeStampToFriendly, extractTimeFromFriendlySlot, formatFriendlyDate, formatTotal } from './general-utils';
 import { weatherIconElement, spanElement, temperatureElement, rainChanceElement, tableCellElement, tableHeaderRowElement, tableElement, tableBodyElement, tableRowElement, editOveridesIconElement, overrideButtonsDivElement, divElement, overrideIconElement, modalCloseIcon, numberInputElement, buttonElement, errorCard, tableHeadElement, getOverrideIconStyles, infoCard, barElement, socBarElement } from './html-utils';
 import { Temporal } from '@js-temporal/polyfill';
 
@@ -638,7 +638,7 @@ export class TableRenderer {
 
     await this._callInputTextSetService(iBoostSlotsEntity, updatedSlots.join(','));
 
-    const loadAdjustOptions = updatedSlots.map((slot: string) => `${this._extractTimeFromFriendlySlot(slot)}=${this._configManager.iboostKwh}`);
+    const loadAdjustOptions = updatedSlots.map((slot: string) => `${extractTimeFromFriendlySlot(slot)}=${this._configManager.iboostKwh}`);
 
     if (loadAdjustOptions.length > 0) {
       await this._callSelectOptionService(iBoostLoadAdjustEntity, loadAdjustOptions.join(','));
@@ -650,13 +650,6 @@ export class TableRenderer {
     this._closePopupIfOpen(fromPopup);
 
     if (this._onUpdateRequested) this._onUpdateRequested();
-  }
-
-  private _extractTimeFromFriendlySlot(friendlySlot: string): string {
-    const match = friendlySlot.match(/(\d{2}:\d{2})$/);
-    if (match === null) throw new Error(`Invalid friendly slot "${friendlySlot}"`);
-
-    return match[1];
   }
 
   private _closePopupIfOpen(fromPopup: boolean): void {

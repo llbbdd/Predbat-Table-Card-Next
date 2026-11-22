@@ -28,6 +28,43 @@ export function convertTimeStampToFriendly(dateString: string): string {
   return `${get('weekday')} ${get('hour')}:${get('minute')}`;
 }
 
+export function extractTimeFromFriendlySlot(friendlySlot: string): string {
+  const match = friendlySlot.match(/(\d{2}:\d{2})$/);
+  if (match === null) throw new Error(`Invalid friendly slot "${friendlySlot}"`);
+
+  return match[1];
+}
+
+export function friendlySlotToPlainDateTime(friendlySlot: string): Temporal.PlainDateTime | null {
+  const match = friendlySlot.match(/^(\w{3}) (\d{2}):(\d{2})$/);
+  if (match === null) return null;
+
+  const dayAbbrev = match[1];
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return null;
+
+  const now = Temporal.Now.plainDateTimeISO();
+
+  for (let offset = 0; offset < 7; offset++) {
+    const candidate = now.add({ days: offset }).with({
+      hour,
+      minute,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0
+    });
+
+    if (candidate.toLocaleString('en-GB', { weekday: 'short' }) === dayAbbrev) {
+      return candidate;
+    }
+  }
+
+  return null;
+}
+
 function normaliseOffset(dateString: string): string {
   const suffix = dateString.slice(-6);
 

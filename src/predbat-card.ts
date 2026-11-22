@@ -1,4 +1,4 @@
-import { cardHeight, githubRepo, restApiPort } from './constants';
+import { cardHeight, githubRepo, iBoostLoadAdjustEntity, iBoostSlotsEntity, restApiPort } from './constants';
 import { configForm } from './schemas/configForm';
 import { HomeAssistantService } from './services/home-assistant-service';
 import { WeatherService } from './services/weather-service';
@@ -13,6 +13,7 @@ import { PredbatData } from './PredbatData';
 import { logger } from './utils/logger';
 import z from 'zod';
 import { GitHubService } from './services/github-service';
+import { extractTimeFromFriendlySlot, friendlySlotToPlainDateTime } from './utils/general-utils';
 
 type PlanStatus = 'waiting' | 'failed' | 'available';
 
@@ -28,6 +29,7 @@ class PredbatTableCard extends HTMLElement {
   private _restApiAvailable = false;
   private _lastPlanUpdated: string | null = null;
   private _initialisingRestApi = false;
+  private _pruneInProgress = false;
 
   // reactive data
   private _reactiveDataState: { overrides: string | null, generatingPlan: boolean, carCharging: 'on' | 'off' | undefined } = {
@@ -72,6 +74,13 @@ class PredbatTableCard extends HTMLElement {
     this._tableRenderer.callInputTextSetService = this._haService.callInputTextSetService;
     this._tableRenderer.callInputNumberSetService = this._haService.callInputNumberSetService;
     this._tableRenderer.state = this._haService.getAllState();
+
+    void this._pruneIboostPastSlotsIfNeeded()
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+
+        logger.warn(`_pruneIboostPastSlotsIfNeeded failed: ${message}`, error);
+      });
 
     // Render on reactive state changes
     const currentOverrideState = this._getOverrideStateString();
@@ -293,6 +302,63 @@ class PredbatTableCard extends HTMLElement {
       .finally(() => {
         this._initialisingRestApi = false;
       });
+  }
+
+  private async _pruneIboostPastSlotsIfNeeded(): Promise<void> {
+    if (this._pruneInProgress) return;
+
+    const slotsState = this._haService.getAllState()[iBoostSlotsEntity]?.state;
+
+    if (slotsState === undefined) return;
+
+    const currentSlots = slotsState
+      .replace(/^\+/, '')
+      .split(',')
+      .map((entry: string) => entry.trim())
+      .filter(Boolean);
+
+    if (currentSlots.length === 0) return;
+
+    const now = Temporal.Now.plainDateTimeISO();
+    const currentSlot = now.with({
+      minute: now.minute < 30 ? 0 : 30,
+      second: 0,
+      millisecond: 0,
+      microsecond: 0,
+      nanosecond: 0
+    });
+
+    const futureSlots = currentSlots.filter((slot) => {
+      const parsed = friendlySlotToPlainDateTime(slot);
+      if (parsed === null) return true;
+
+      return Temporal.PlainDateTime.compare(parsed, currentSlot) >= 0;
+    });
+
+    if (futureSlots.length === currentSlots.length) return;
+
+    this._pruneInProgress = true;
+
+    try {
+      await this._haService.callInputTextSetService(iBoostSlotsEntity, futureSlots.join(','));
+
+      const iboostKwh = this._configManager.iboostKwh;
+      const loadAdjustOptions = futureSlots.map((slot: string) => {
+        const time = extractTimeFromFriendlySlot(slot);
+        return `${time}=${iboostKwh}`;
+      });
+
+      if (loadAdjustOptions.length > 0) {
+        await this._haService.callSelectOptionService(iBoostLoadAdjustEntity, loadAdjustOptions.join(','));
+      }
+      else {
+        await this._haService.callSelectOptionService(iBoostLoadAdjustEntity, 'off');
+      }
+    }
+    finally {
+      this._pruneInProgress = false;
+      this._render();
+    }
   }
 
   private async _fetchIboostHistory(): Promise<Map<string, number> | null> {

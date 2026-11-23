@@ -288,7 +288,7 @@ export class TableRenderer {
               let isHighlighted = false;
               let activeEntity: EntityObject | null = null;
 
-              const isClickable = this._checkRowIsAllowedForOverride(forceEntityObjects, friendlyTimeValue);
+              const isClickable = this._checkRowIsAllowedForOverride(forceEntityObjects, friendlyTimeValue, timeValue);
 
               for (const forceEntity of forceEntityObjects) {
                 const key = this._extractManualOverrideKey(forceEntity.entityName);
@@ -328,7 +328,7 @@ export class TableRenderer {
             }
             case 'overrides-column': {
               const friendlyTimeValue = convertTimeStampToFriendly(timeValue);
-              const isClickable = this._checkRowIsAllowedForOverride(forceEntityObjects, friendlyTimeValue);
+              const isClickable = this._checkRowIsAllowedForOverride(forceEntityObjects, friendlyTimeValue, timeValue);
               const overrideButtonsGroup = spanElement('overrideButtons');
 
               for (const forceEntity of forceEntityObjects) {
@@ -736,7 +736,9 @@ export class TableRenderer {
     });
   }
 
-  private _checkRowIsAllowedForOverride(forceEntityObjects: EntityObject[], timeForSelectOverride: string | null): boolean {
+  private _checkRowIsAllowedForOverride(forceEntityObjects: EntityObject[], timeForSelectOverride: string | null, rowTimeValue: string): boolean {
+    if (this._isPastSlot(rowTimeValue)) return false;
+
     let isAllowed = false;
 
     for (const forceEntity of forceEntityObjects) {
@@ -749,6 +751,16 @@ export class TableRenderer {
       }
     }
     return isAllowed;
+  }
+
+  private _isPastSlot(timeValue: string): boolean {
+    const rowTime = Temporal.PlainDateTime.from(timeValue);
+    const now = Temporal.Now.plainDateTimeISO();
+    const currentSlot = now.with({
+      minute: now.minute < 30 ? 0 : 30,
+      second: 0, millisecond: 0, microsecond: 0, nanosecond: 0
+    });
+    return Temporal.PlainDateTime.compare(rowTime, currentSlot) < 0;
   }
 
   private _openModal(overlayId: string, buildModalBox: (closeModal: () => void) => HTMLElement | null): { overlay: HTMLDivElement; closeModal: () => void } | null {

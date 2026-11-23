@@ -271,7 +271,9 @@ export class TableRenderer {
                 const maxValue = this._getColumnGroupMax(column, predbatData.plan);
                 const invertBarColour = column === 'pv-column' || column === 'net-energy-column'; // low value is green, high is red; invert for low value is red, high is green
 
-                cellInner.appendChild(barElement(columnData.value, maxValue, invertBarColour, true, maxValue));
+                const hideZero = column === 'pv-column' || column === 'iboost-column';
+
+                cellInner.appendChild(barElement(columnData.value, maxValue, invertBarColour, hideZero, maxValue));
               }
               else {
                 cellInner.style.color = columnData.colour;

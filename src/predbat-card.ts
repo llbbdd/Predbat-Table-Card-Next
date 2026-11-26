@@ -14,6 +14,7 @@ import { logger } from './utils/logger';
 import z from 'zod';
 import { GitHubService } from './services/github-service';
 import { extractTimeFromFriendlySlot, friendlySlotToPlainDateTime } from './utils/general-utils';
+import { Temporal } from '@js-temporal/polyfill';
 
 type PlanStatus = 'waiting' | 'failed' | 'available';
 
@@ -398,6 +399,9 @@ class PredbatTableCard extends HTMLElement {
     }
   }
 
+  // TODO - adjust select.predbat_mode (Control Charge, Control Charge & Discharge, Demand, etc)
+  // TODO - add holiday schedule - set input_number.predbat_holiday_days_left
+  // TODO - does force charge work?
   private _render(): void {
     if (this._planStatus === 'failed') {
       this._tableRenderer.renderError('Predbat plan not available');
